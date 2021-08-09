@@ -1,3 +1,5 @@
+import { CharacterEntity } from './character.entity';
+import { FandomEntity } from './fandom.entity';
 import { EStoryStatus } from './../types/storyStatus.enum';
 import { ERating } from './../types/raiting.enum';
 import { TagEntity } from './tag.entity';
@@ -68,6 +70,14 @@ export class StoryEntity {
   @ManyToMany(() => UserEntity)
   @JoinTable()
   betas: UserEntity[];
+
+  @ManyToMany(() => FandomEntity)
+  @JoinTable()
+  fandoms: FandomEntity[];
+
+  @ManyToMany(() => CharacterEntity)
+  @JoinTable()
+  characters: CharacterEntity[];
 
   @BeforeUpdate()
   updateTimestamp() {
