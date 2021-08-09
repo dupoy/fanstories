@@ -1,3 +1,4 @@
+import { ProfileModule } from './../modules/profile/profile.module';
 import { UserModule } from './../modules/user/user.module';
 require('dotenv').config();
 
@@ -8,7 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import config from 'src/orm.config';
 
 @Module({
-  imports: [UserModule, TypeOrmModule.forRoot(config)],
+  imports: [ProfileModule, UserModule, TypeOrmModule.forRoot(config)],
   controllers: [AppController],
   providers: [AppService],
 })

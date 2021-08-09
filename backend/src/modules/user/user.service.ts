@@ -65,7 +65,7 @@ export class UserService {
     return condidate;
   }
 
-  async findById(currentUserId: number): Promise<UserEntity> {
+  async findOneById(currentUserId: number): Promise<UserEntity> {
     return this.userRepository.findOne(currentUserId);
   }
 
