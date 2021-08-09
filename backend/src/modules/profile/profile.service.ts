@@ -1,3 +1,4 @@
+import { IProfileResponse } from './types/profileResponse.interface';
 import { UserEntity } from './../../entities/user.entity';
 import { HttpException, Injectable, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -87,5 +88,12 @@ export class ProfileService {
     }
 
     return { ...profile, following: false };
+  }
+
+  buildResponse(profile: ProfileType): IProfileResponse {
+    delete profile.email;
+    return {
+      profile,
+    };
   }
 }
