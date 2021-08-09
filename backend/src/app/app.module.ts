@@ -1,15 +1,18 @@
 require('dotenv').config();
-import { StoryModule } from './../modules/story/story.module';
-import { ChapterModule } from './../modules/chapter/chapter.module';
-import { CharacterModule } from './../modules/character/character.module';
-import { FandomModule } from './../modules/fandom/fandom.module';
-import { ProfileModule } from './../modules/profile/profile.module';
-import { UserModule } from './../modules/user/user.module';
-import { Module } from '@nestjs/common';
+import { AuthMiddleware } from 'src/modules/user/middlewares/auth.middleware';
+import config from 'src/orm.config';
+
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { ChapterModule } from '../modules/chapter/chapter.module';
+import { CharacterModule } from '../modules/character/character.module';
+import { FandomModule } from '../modules/fandom/fandom.module';
+import { ProfileModule } from '../modules/profile/profile.module';
+import { StoryModule } from '../modules/story/story.module';
+import { UserModule } from '../modules/user/user.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import config from 'src/orm.config';
 
 @Module({
   imports: [
@@ -24,4 +27,11 @@ import config from 'src/orm.config';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthMiddleware).forRoutes({
+      path: '*',
+      method: RequestMethod.ALL,
+    });
+  }
+}
