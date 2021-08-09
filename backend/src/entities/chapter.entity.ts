@@ -1,13 +1,9 @@
-import { StoryEntity } from './story.entity';
-import {
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  BeforeInsert,
-  BeforeUpdate,
-} from 'typeorm';
 import slugify from 'slugify';
+import {
+    BeforeInsert, BeforeUpdate, Column, Entity, ManyToOne, PrimaryGeneratedColumn
+} from 'typeorm';
+
+import { StoryEntity } from './story.entity';
 
 @Entity('chapters')
 export class ChapterEntity {
@@ -26,7 +22,7 @@ export class ChapterEntity {
   @Column({ default: 0 })
   words: number;
 
-  @ManyToOne(() => StoryEntity, (story) => story.chapters, { eager: true })
+  @ManyToOne(() => StoryEntity, (story) => story.chapters)
   story: StoryEntity;
 
   @BeforeInsert()

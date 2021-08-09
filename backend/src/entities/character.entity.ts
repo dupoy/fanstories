@@ -1,11 +1,6 @@
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+
 import { FandomEntity } from './fandom.entity';
-import {
-  Column,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-} from 'typeorm';
 
 @Entity('characters')
 export class CharacterEntity {
@@ -15,6 +10,8 @@ export class CharacterEntity {
   @Column()
   name: string;
 
-  @ManyToOne(() => FandomEntity, (fandom) => fandom.characters)
+  @ManyToOne(() => FandomEntity, (fandom) => fandom.characters, {
+    eager: false,
+  })
   fandom: FandomEntity;
 }

@@ -1,13 +1,8 @@
+import slugify from 'slugify';
 import {
-  BeforeInsert,
-  BeforeUpdate,
-  Column,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
+    BeforeInsert, BeforeRemove, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn
 } from 'typeorm';
 
-import slugify from 'slugify';
 import { CharacterEntity } from './character.entity';
 
 @Entity('fandoms')
@@ -24,14 +19,10 @@ export class FandomEntity {
   @Column({ default: '' })
   description: string;
 
-  @OneToMany(() => CharacterEntity, (character) => character.fandom)
+  @OneToMany(() => CharacterEntity, (character) => character.fandom, {
+    eager: true,
+  })
   characters: CharacterEntity[];
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  normalizeTitle() {
-    this.title = this.title.toLowerCase().trim();
-  }
 
   @BeforeInsert()
   @BeforeUpdate()
