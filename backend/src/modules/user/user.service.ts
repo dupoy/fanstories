@@ -42,9 +42,12 @@ export class UserService {
   }
 
   async loginUser(loginUserDto: LoginUserDto): Promise<UserEntity> {
-    const condidate = await this.userRepository.findOne({
-      email: loginUserDto.email,
-    });
+    const condidate = await this.userRepository.findOne(
+      {
+        email: loginUserDto.email,
+      },
+      { select: ['id', 'email', 'username', 'bio', 'image', 'password'] },
+    );
 
     if (!condidate) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
