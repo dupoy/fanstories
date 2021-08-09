@@ -1,8 +1,10 @@
-import { UserService } from '../user.service';
-import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Response } from 'express';
-import { IRequest } from 'src/types/request.interface';
 import { verify } from 'jsonwebtoken';
+import { IRequest } from 'src/types/request.interface';
+
+import { Injectable, NestMiddleware } from '@nestjs/common';
+
+import { UserService } from '../user.service';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
@@ -24,5 +26,7 @@ export class AuthMiddleware implements NestMiddleware {
     } catch (e) {
       req.user = null;
     }
+
+    next();
   }
 }
