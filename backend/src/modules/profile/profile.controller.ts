@@ -1,8 +1,10 @@
-import { IProfileResponse } from './types/profileResponse.interface';
-import { ProfileType } from './types/profile.type';
-import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+
 import { User } from '../user/decorators/user.decorator';
+import { AuthGuard } from '../user/guards/auth.guard';
 import { ProfileService } from './profile.service';
+import { ProfileType } from './types/profile.type';
+import { IProfileResponse } from './types/profileResponse.interface';
 
 @Controller('/profiles')
 export class ProfileController {
@@ -17,6 +19,7 @@ export class ProfileController {
   }
 
   @Post('/:username/follow')
+  @UseGuards(AuthGuard)
   async followProfile(
     @Param('username') username: string,
     @User('id') currentUserId: number,
@@ -27,6 +30,7 @@ export class ProfileController {
   }
 
   @Delete('/:username/unfollow')
+  @UseGuards(AuthGuard)
   async unfollowProfile(
     @Param('username') username: string,
     @User('id') currentUserId: number,
