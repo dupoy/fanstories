@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 import { AuthMiddleware } from 'src/modules/user/middlewares/auth.middleware';
 import config from 'src/orm.config';
 
@@ -14,7 +16,6 @@ import { UserModule } from '../modules/user/user.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-require('dotenv').config();
 @Module({
   imports: [
     TagModule,
