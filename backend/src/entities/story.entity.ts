@@ -5,7 +5,7 @@ import {
     PrimaryGeneratedColumn
 } from 'typeorm';
 
-import { ERating } from '../types/raiting.enum';
+import { ERating } from '../types/rating.enum';
 import { EStoryStatus } from '../types/storyStatus.enum';
 import { ChapterEntity } from './chapter.entity';
 import { FandomEntity } from './fandom.entity';
@@ -35,13 +35,17 @@ export class StoryEntity {
   @Column({ type: 'enum', enum: EFocus })
   focus: EFocus;
 
-  @Column({ type: 'enum', enum: EStoryStatus })
+  @Column({
+    type: 'enum',
+    enum: EStoryStatus,
+    default: EStoryStatus.IN_PROGRESS,
+  })
   status: EStoryStatus;
 
-  @Column()
+  @Column({ default: 0 })
   favoriteCount: number;
 
-  @Column()
+  @Column({ default: 0 })
   followCount: number;
 
   @ManyToOne(() => UserEntity, (user) => user.stories, { eager: true })

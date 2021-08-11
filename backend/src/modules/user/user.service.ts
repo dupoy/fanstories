@@ -1,12 +1,14 @@
-import { UserEntity } from './../../entities/user.entity';
+import { compare } from 'bcrypt';
+import { sign } from 'jsonwebtoken';
+import { In, Repository } from 'typeorm';
+
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+
+import { UserEntity } from '../../entities/user.entity';
 import { CreateUserDto } from './dto/createUser.dto';
-import { IUserResponse } from './types/userResponse.interface';
-import { sign } from 'jsonwebtoken';
-import { compare } from 'bcrypt';
 import { LoginUserDto } from './dto/loginUser.dto';
+import { IUserResponse } from './types/userResponse.interface';
 
 @Injectable()
 export class UserService {
@@ -69,7 +71,13 @@ export class UserService {
   }
 
   async findOneById(currentUserId: number): Promise<UserEntity> {
-    return this.userRepository.findOne(currentUserId);
+    return this.userRepository.findOne(currentUserId, {
+      relations: ['followStories', 'favoriteStories'],
+    });
+  }
+
+  async find(betas: string[]): Promise<UserEntity[]> {
+    return this.userRepository.find({ username: In(betas) });
   }
 
   buildResponse(user: UserEntity): IUserResponse {

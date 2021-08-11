@@ -1,5 +1,6 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 
+import { AuthGuard } from '../user/guards/auth.guard';
 import { CreateTagDto } from './dto/createTag.dto';
 import { TagService } from './tag.service';
 import { ITagResponse } from './types/tagResponse.interface';
@@ -9,6 +10,7 @@ export class TagController {
   constructor(private readonly tagService: TagService) {}
 
   @Post()
+  @UseGuards(AuthGuard)
   async createTag(
     @Body('tag') createTagDto: CreateTagDto,
   ): Promise<ITagResponse> {

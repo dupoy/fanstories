@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -26,6 +26,10 @@ export class TagService {
     }
 
     return this.tagRepository.save(tag);
+  }
+
+  async find(tags: string[]): Promise<TagEntity[]> {
+    return this.tagRepository.find({ title: In(tags) });
   }
 
   buildResponse(tag: TagEntity): ITagResponse {

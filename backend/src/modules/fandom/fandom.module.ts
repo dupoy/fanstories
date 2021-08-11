@@ -11,5 +11,6 @@ import { FandomService } from './fandom.service';
   imports: [TypeOrmModule.forFeature([FandomEntity, CharacterEntity])],
   controllers: [FandomController],
   providers: [FandomService, CharacterService],
+  exports: [FandomService],
 })
 export class FandomModule {}

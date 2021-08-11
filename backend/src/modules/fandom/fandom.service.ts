@@ -1,5 +1,5 @@
 import slugify from 'slugify';
-import { createQueryBuilder, DeleteResult, Repository } from 'typeorm';
+import { DeleteResult, In, Repository } from 'typeorm';
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,6 +9,7 @@ import { CharacterService } from '../character/character.service';
 import { CreateFandomDto } from './dto/createFandom.dto';
 import { IFandomResponse } from './types/fandomResponse.interface';
 import { IFandomsResponse } from './types/fandomsResponse.interface';
+import { QueryParams } from './types/queryParams.interface';
 
 @Injectable()
 export class FandomService {
@@ -51,16 +52,15 @@ export class FandomService {
     return fandom;
   }
 
-  async find(): Promise<IFandomsResponse> {
-    const queryBuilder = createQueryBuilder(
-      FandomEntity,
-      'fandom',
-    ).leftJoinAndSelect('fandom.characters', 'characters');
+  async find(queryParams: QueryParams): Promise<IFandomsResponse> {
+    const fandoms = await this.fandomRepository.find({
+      relations: ['characters'],
+      where: {
+        title: In(queryParams.titles),
+      },
+    });
 
-    const fandomCount = await queryBuilder.getCount();
-    const fandoms = await queryBuilder.getMany();
-
-    return { fandoms: fandoms, fandomCount };
+    return { fandoms: fandoms, fandomCount: fandoms.length };
   }
 
   async findOneAndDelete(slug: string): Promise<DeleteResult> {

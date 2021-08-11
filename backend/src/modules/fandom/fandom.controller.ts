@@ -1,12 +1,13 @@
 import { DeleteResult } from 'typeorm';
 
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 
 import { AuthGuard } from '../user/guards/auth.guard';
 import { CreateFandomDto } from './dto/createFandom.dto';
 import { FandomService } from './fandom.service';
 import { IFandomResponse } from './types/fandomResponse.interface';
 import { IFandomsResponse } from './types/fandomsResponse.interface';
+import { QueryParams } from './types/queryParams.interface';
 
 @Controller('fandoms')
 export class FandomController {
@@ -29,9 +30,9 @@ export class FandomController {
     );
   }
 
-  @Get('')
-  async getFandoms(): Promise<IFandomsResponse> {
-    return this.fandomService.find();
+  @Get()
+  async getFandoms(@Query() query: QueryParams): Promise<IFandomsResponse> {
+    return this.fandomService.find(query);
   }
 
   @Delete('/:slug')
