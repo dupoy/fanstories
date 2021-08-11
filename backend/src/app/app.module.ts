@@ -1,4 +1,3 @@
-require('dotenv').config();
 import { AuthMiddleware } from 'src/modules/user/middlewares/auth.middleware';
 import config from 'src/orm.config';
 
@@ -10,12 +9,15 @@ import { CharacterModule } from '../modules/character/character.module';
 import { FandomModule } from '../modules/fandom/fandom.module';
 import { ProfileModule } from '../modules/profile/profile.module';
 import { StoryModule } from '../modules/story/story.module';
+import { TagModule } from '../modules/tag/tag.module';
 import { UserModule } from '../modules/user/user.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
+require('dotenv').config();
 @Module({
   imports: [
+    TagModule,
     StoryModule,
     ChapterModule,
     CharacterModule,
