@@ -96,15 +96,12 @@ export class StoryEntity {
     this.slug = slugify(this.title);
   }
 
-  @BeforeInsert()
-  @BeforeUpdate()
-  countWords() {
-    console.log('here');
-
+  countWords(): number {
     if (this.chapters) {
       this.words = this.chapters.reduce((acc, prev: ChapterEntity) => {
         return (acc += prev.words);
       }, 0);
     }
+    return this.words;
   }
 }
