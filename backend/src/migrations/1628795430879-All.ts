@@ -1,18 +1,18 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class ChangeCharactersInStoryAndAddPairings1628670442703 implements MigrationInterface {
-    name = 'ChangeCharactersInStoryAndAddPairings1628670442703'
+export class All1628795430879 implements MigrationInterface {
+    name = 'All1628795430879'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "characters" ("id" SERIAL NOT NULL, "name" character varying NOT NULL, "fandomId" integer, CONSTRAINT "PK_9d731e05758f26b9315dac5e378" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "fandoms" ("id" SERIAL NOT NULL, "slug" character varying NOT NULL, "title" character varying NOT NULL, "description" character varying NOT NULL DEFAULT '', CONSTRAINT "PK_bfd9c6b6116a9b84cacd1e09d33" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "focuses" ("id" SERIAL NOT NULL, "value" character varying NOT NULL, "description" character varying NOT NULL, CONSTRAINT "PK_2677bb7addae8c13d5cb86f785e" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "ratings" ("id" SERIAL NOT NULL, "value" character varying NOT NULL, "description" character varying NOT NULL, CONSTRAINT "PK_0f31425b073219379545ad68ed9" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "tags" ("id" SERIAL NOT NULL, "title" character varying NOT NULL, "description" character varying NOT NULL DEFAULT '', CONSTRAINT "PK_e7dc17249a1148a1970748eda99" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "users" ("id" SERIAL NOT NULL, "username" character varying NOT NULL, "email" character varying NOT NULL, "password" character varying NOT NULL, "bio" character varying NOT NULL DEFAULT '', "image" character varying NOT NULL, CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TYPE "stories_rating_enum" AS ENUM('G', 'PG-13', 'R', 'NC-17', 'NC-21')`);
-        await queryRunner.query(`CREATE TYPE "stories_focus_enum" AS ENUM('Jen', 'Get', 'Slash', 'Femslash', 'Other', 'Article')`);
         await queryRunner.query(`CREATE TYPE "stories_status_enum" AS ENUM('In progress', 'Completed', 'Abandoned')`);
-        await queryRunner.query(`CREATE TABLE "stories" ("id" SERIAL NOT NULL, "slug" character varying NOT NULL, "title" character varying NOT NULL, "description" character varying NOT NULL, "words" integer NOT NULL DEFAULT '0', "rating" "stories_rating_enum" NOT NULL, "focus" "stories_focus_enum" NOT NULL, "status" "stories_status_enum" NOT NULL, "favoriteCount" integer NOT NULL, "followCount" integer NOT NULL, "characters" text NOT NULL, "pairings" text NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "authorId" integer, CONSTRAINT "PK_bb6f880b260ed96c452b32a39f0" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "chapters" ("id" SERIAL NOT NULL, "slug" character varying NOT NULL, "title" character varying NOT NULL, "body" character varying NOT NULL, "words" integer NOT NULL DEFAULT '0', "storyId" integer, CONSTRAINT "PK_a2bbdbb4bdc786fe0cb0fcfc4a0" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "stories" ("id" SERIAL NOT NULL, "slug" character varying NOT NULL, "title" character varying NOT NULL, "description" character varying NOT NULL, "words" integer NOT NULL DEFAULT '0', "status" "stories_status_enum" NOT NULL DEFAULT 'In progress', "favoriteCount" integer NOT NULL DEFAULT '0', "followCount" integer NOT NULL DEFAULT '0', "isPublished" boolean NOT NULL DEFAULT false, "characters" text NOT NULL, "pairings" text NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "ratingId" integer, "focusId" integer, "authorId" integer, CONSTRAINT "PK_bb6f880b260ed96c452b32a39f0" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "chapters" ("id" SERIAL NOT NULL, "slug" character varying NOT NULL, "title" character varying NOT NULL, "body" character varying NOT NULL, "words" integer NOT NULL DEFAULT '0', "isPublished" boolean NOT NULL DEFAULT false, "storyId" integer, CONSTRAINT "PK_a2bbdbb4bdc786fe0cb0fcfc4a0" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "users_follow_authors_users" ("usersId_1" integer NOT NULL, "usersId_2" integer NOT NULL, CONSTRAINT "PK_8323fbfb2b574b683371fc553e5" PRIMARY KEY ("usersId_1", "usersId_2"))`);
         await queryRunner.query(`CREATE INDEX "IDX_5de6ce1c4b87ab58d991e538ae" ON "users_follow_authors_users" ("usersId_1") `);
         await queryRunner.query(`CREATE INDEX "IDX_4af1c6afbfd100fe60a2f3c101" ON "users_follow_authors_users" ("usersId_2") `);
@@ -32,6 +32,8 @@ export class ChangeCharactersInStoryAndAddPairings1628670442703 implements Migra
         await queryRunner.query(`CREATE INDEX "IDX_22ef4881d7d290eec4031efa51" ON "stories_betas_users" ("storiesId") `);
         await queryRunner.query(`CREATE INDEX "IDX_9cc3fb506c0960afe31eb0457d" ON "stories_betas_users" ("usersId") `);
         await queryRunner.query(`ALTER TABLE "characters" ADD CONSTRAINT "FK_88918b5da01d96a7aa81f69b51d" FOREIGN KEY ("fandomId") REFERENCES "fandoms"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "stories" ADD CONSTRAINT "FK_3a7631dea3d159733672f3a82f0" FOREIGN KEY ("ratingId") REFERENCES "ratings"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "stories" ADD CONSTRAINT "FK_c607cf60a46306204fdd5e43549" FOREIGN KEY ("focusId") REFERENCES "focuses"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "stories" ADD CONSTRAINT "FK_e36e259ea3b3799645774194033" FOREIGN KEY ("authorId") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "chapters" ADD CONSTRAINT "FK_2720e441e621b26246278c0ea4c" FOREIGN KEY ("storyId") REFERENCES "stories"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "users_follow_authors_users" ADD CONSTRAINT "FK_5de6ce1c4b87ab58d991e538ae7" FOREIGN KEY ("usersId_1") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
@@ -63,6 +65,8 @@ export class ChangeCharactersInStoryAndAddPairings1628670442703 implements Migra
         await queryRunner.query(`ALTER TABLE "users_follow_authors_users" DROP CONSTRAINT "FK_5de6ce1c4b87ab58d991e538ae7"`);
         await queryRunner.query(`ALTER TABLE "chapters" DROP CONSTRAINT "FK_2720e441e621b26246278c0ea4c"`);
         await queryRunner.query(`ALTER TABLE "stories" DROP CONSTRAINT "FK_e36e259ea3b3799645774194033"`);
+        await queryRunner.query(`ALTER TABLE "stories" DROP CONSTRAINT "FK_c607cf60a46306204fdd5e43549"`);
+        await queryRunner.query(`ALTER TABLE "stories" DROP CONSTRAINT "FK_3a7631dea3d159733672f3a82f0"`);
         await queryRunner.query(`ALTER TABLE "characters" DROP CONSTRAINT "FK_88918b5da01d96a7aa81f69b51d"`);
         await queryRunner.query(`DROP INDEX "IDX_9cc3fb506c0960afe31eb0457d"`);
         await queryRunner.query(`DROP INDEX "IDX_22ef4881d7d290eec4031efa51"`);
@@ -85,10 +89,10 @@ export class ChangeCharactersInStoryAndAddPairings1628670442703 implements Migra
         await queryRunner.query(`DROP TABLE "chapters"`);
         await queryRunner.query(`DROP TABLE "stories"`);
         await queryRunner.query(`DROP TYPE "stories_status_enum"`);
-        await queryRunner.query(`DROP TYPE "stories_focus_enum"`);
-        await queryRunner.query(`DROP TYPE "stories_rating_enum"`);
         await queryRunner.query(`DROP TABLE "users"`);
         await queryRunner.query(`DROP TABLE "tags"`);
+        await queryRunner.query(`DROP TABLE "ratings"`);
+        await queryRunner.query(`DROP TABLE "focuses"`);
         await queryRunner.query(`DROP TABLE "fandoms"`);
         await queryRunner.query(`DROP TABLE "characters"`);
     }

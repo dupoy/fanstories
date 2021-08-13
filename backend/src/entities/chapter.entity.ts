@@ -25,6 +25,20 @@ export class ChapterEntity {
   @ManyToOne(() => StoryEntity, (story) => story.chapters)
   story: StoryEntity;
 
+  @Column({ default: false })
+  isPublished: boolean;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
+
+  @BeforeUpdate()
+  updateTimestamp() {
+    this.updatedAt = new Date();
+  }
+
   @BeforeInsert()
   @BeforeUpdate()
   slugifyTitle() {
@@ -34,8 +48,6 @@ export class ChapterEntity {
   @BeforeInsert()
   @BeforeUpdate()
   countWords() {
-    this.story.words -= this.words;
     this.words = this.body.replace(/[^a-zа-яё\s]/gi, '').split(' ').length;
-    this.story.words += this.words;
   }
 }

@@ -1,5 +1,5 @@
 import slugify from 'slugify';
-import { DeleteResult, In, Repository } from 'typeorm';
+import { DeleteResult, In, MoreThan, Repository } from 'typeorm';
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -52,11 +52,11 @@ export class FandomService {
     return fandom;
   }
 
-  async find(queryParams: QueryParams): Promise<IFandomsResponse> {
+  async find(queryParams?: QueryParams): Promise<IFandomsResponse> {
     const fandoms = await this.fandomRepository.find({
       relations: ['characters'],
       where: {
-        title: In(queryParams.titles),
+        title: queryParams.titles ? In(queryParams.titles) : MoreThan(0),
       },
     });
 

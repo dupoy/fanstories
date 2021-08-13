@@ -9,8 +9,8 @@ import { FandomService } from '../fandom/fandom.service';
 import { ProfileService } from '../profile/profile.service';
 import { TagService } from '../tag/tag.service';
 import { UserService } from '../user/user.service';
-import { CreateStoryDto } from './dto/createStory.dto';
-import { UpdateStoryDto } from './dto/updateStory.dto';
+import { UtilsService } from '../utils/utils.service';
+import { SaveStoryDto } from './dto/saveStory.dto';
 import { IStoryResponse } from './types/storyResponse.interface';
 
 @Injectable()
@@ -22,10 +22,11 @@ export class StoryService {
     private readonly tagService: TagService,
     private readonly famdomService: FandomService,
     private readonly profileService: ProfileService,
+    private readonly utilsService: UtilsService,
   ) {}
 
   async createStory(
-    createStoryDto: CreateStoryDto,
+    createStoryDto: SaveStoryDto,
     currentUserId: number,
   ): Promise<StoryEntity> {
     const currentUser = await this.userService.findOneById(currentUserId);
@@ -39,6 +40,14 @@ export class StoryService {
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
+
+    const rating = await this.utilsService.findOneByValueRating(
+      createStoryDto.rating,
+    );
+
+    const focus = await this.utilsService.findOneByValueFocus(
+      createStoryDto.focus,
+    );
 
     const tags = await this.tagService.find(createStoryDto.tags || []);
     const fandoms = (
@@ -56,6 +65,8 @@ export class StoryService {
       fandoms,
       tags,
       betas,
+      focus,
+      rating,
       author: currentUser,
     });
 
@@ -67,7 +78,7 @@ export class StoryService {
   }
 
   async findOneBySlugAndUpdate(
-    updateStoryDto: UpdateStoryDto,
+    updateStoryDto: SaveStoryDto,
     slug: string,
     currentUserId: number,
   ): Promise<StoryEntity> {
@@ -84,39 +95,43 @@ export class StoryService {
       );
     }
 
-    const tags = await this.tagService.find(updateStoryDto.tags || []);
+    const rating = await this.utilsService.findOneByValueRating(
+      updateStoryDto.rating,
+    );
+
+    const focus = await this.utilsService.findOneByValueFocus(
+      updateStoryDto.focus,
+    );
+
+    const tags = await this.tagService.find(updateStoryDto.tags);
     const fandoms = (
       await this.famdomService.find({
-        titles: updateStoryDto.fandoms || [],
+        titles: updateStoryDto.fandoms,
       })
     ).fandoms.map((fandom) => {
-      delete fandom.characters;
       return fandom;
     });
-    const betas = await this.userService.find(updateStoryDto.betas || []);
+    const betas = await this.userService.find(updateStoryDto.betas);
 
-    if (tags.length > 0) {
-      Object.assign(story, { tags });
-      delete updateStoryDto.tags;
-    }
-
-    if (fandoms.length > 0) {
-      Object.assign(story, { fandoms });
-      delete updateStoryDto.fandoms;
-    }
-
-    if (betas.length > 0) {
-      Object.assign(story, { betas });
-      delete updateStoryDto.betas;
-    }
-
-    return this.storyRepository.save(Object.assign(story, updateStoryDto));
+    return this.storyRepository.save(
+      Object.assign(story, updateStoryDto, {
+        focus,
+        rating,
+        fandoms,
+        betas,
+        tags,
+      }),
+    );
   }
 
   async buildResponse(
     story: StoryEntity,
     currentUserId: number,
   ): Promise<IStoryResponse> {
+    if (!story) {
+      throw new HttpException("Story doesn't exist", HttpStatus.NOT_FOUND);
+    }
+
     const profile = await this.profileService.findOneByUsername(
       story.author.username,
       currentUserId,

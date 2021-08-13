@@ -1,12 +1,8 @@
-import { EFocus } from 'src/types/focus.enum';
-
-import { ERating } from '../../../types/rating.enum';
-
-export class CreateStoryDto {
+export class SaveStoryDto {
   readonly title: string;
   readonly description: string;
-  readonly rating: ERating;
-  readonly focus: EFocus;
+  readonly rating: string;
+  readonly focus: string;
   readonly fandoms: string[];
   readonly characters: string[];
   readonly pairings: string[];

@@ -1,14 +1,14 @@
 import slugify from 'slugify';
-import { EFocus } from 'src/types/focus.enum';
 import {
     BeforeInsert, BeforeUpdate, Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany,
     PrimaryGeneratedColumn
 } from 'typeorm';
 
-import { ERating } from '../types/rating.enum';
-import { EStoryStatus } from '../types/storyStatus.enum';
+import { StoryStatuses } from '../types/storyStatus.enum';
 import { ChapterEntity } from './chapter.entity';
 import { FandomEntity } from './fandom.entity';
+import { FocusEntity } from './focus.entity';
+import { RatingEntity } from './rating.entity';
 import { TagEntity } from './tag.entity';
 import { UserEntity } from './user.entity';
 
@@ -29,18 +29,18 @@ export class StoryEntity {
   @Column({ default: 0 })
   words: number;
 
-  @Column({ type: 'enum', enum: ERating })
-  rating: ERating;
+  @ManyToOne(() => RatingEntity, (rating) => rating.stories, { eager: true })
+  rating: RatingEntity;
 
-  @Column({ type: 'enum', enum: EFocus })
-  focus: EFocus;
+  @ManyToOne(() => FocusEntity, (focus) => focus.stories, { eager: true })
+  focus: FocusEntity;
 
   @Column({
     type: 'enum',
-    enum: EStoryStatus,
-    default: EStoryStatus.IN_PROGRESS,
+    enum: StoryStatuses,
+    default: StoryStatuses.IN_PROGRESS,
   })
-  status: EStoryStatus;
+  status: StoryStatuses;
 
   @Column({ default: 0 })
   favoriteCount: number;
@@ -48,10 +48,17 @@ export class StoryEntity {
   @Column({ default: 0 })
   followCount: number;
 
+  @Column({ default: false })
+  isPublished: boolean;
+
   @ManyToOne(() => UserEntity, (user) => user.stories, { eager: true })
   author: UserEntity;
 
-  @OneToMany(() => ChapterEntity, (chapter) => chapter.story)
+  @OneToMany(() => ChapterEntity, (chapter) => chapter.story, {
+    onDelete: 'CASCADE',
+    eager: true,
+    // cascade: true,
+  })
   chapters: ChapterEntity[];
 
   @ManyToMany(() => FandomEntity)
@@ -87,5 +94,17 @@ export class StoryEntity {
   @BeforeUpdate()
   slugifyTitle() {
     this.slug = slugify(this.title);
+  }
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  countWords() {
+    console.log('here');
+
+    if (this.chapters) {
+      this.words = this.chapters.reduce((acc, prev: ChapterEntity) => {
+        return (acc += prev.words);
+      }, 0);
+    }
   }
 }

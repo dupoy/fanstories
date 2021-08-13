@@ -13,11 +13,13 @@ import { ProfileModule } from '../modules/profile/profile.module';
 import { StoryModule } from '../modules/story/story.module';
 import { TagModule } from '../modules/tag/tag.module';
 import { UserModule } from '../modules/user/user.module';
+import { UtilsModule } from '../modules/utils/utils.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 @Module({
   imports: [
+    UtilsModule,
     TagModule,
     StoryModule,
     ChapterModule,

@@ -1,6 +1,6 @@
 import slugify from 'slugify';
 import {
-    BeforeInsert, BeforeRemove, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn
+    BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn
 } from 'typeorm';
 
 import { CharacterEntity } from './character.entity';
@@ -21,6 +21,7 @@ export class FandomEntity {
 
   @OneToMany(() => CharacterEntity, (character) => character.fandom, {
     eager: true,
+    onDelete: 'CASCADE',
   })
   characters: CharacterEntity[];
 
