@@ -5,6 +5,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { StoryEntity } from '../../entities/story.entity';
+import { UserEntity } from '../../entities/user.entity';
 import { FandomService } from '../fandom/fandom.service';
 import { ProfileService } from '../profile/profile.service';
 import { TagService } from '../tag/tag.service';
@@ -20,6 +21,8 @@ export class StoryService {
   constructor(
     @InjectRepository(StoryEntity)
     private readonly storyRepository: Repository<StoryEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
     private readonly userService: UserService,
     private readonly tagService: TagService,
     private readonly famdomService: FandomService,
@@ -235,6 +238,111 @@ export class StoryService {
     };
   }
 
+  async followStory(slug: string, currentUserId: number): Promise<StoryEntity> {
+    const currentUser = await this.userService.findOneById(currentUserId);
+    const story = await this.storyRepository.findOne({ slug });
+
+    if (!story) {
+      throw new HttpException("Story doesn't exist", HttpStatus.NOT_FOUND);
+    }
+
+    if (story.author.id === currentUserId) {
+      throw new HttpException(
+        'You cannot follow yours story',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const inFollow = await currentUser.followStories
+      .map((story) => story.slug)
+      .includes(slug);
+
+    if (!inFollow) {
+      currentUser.followStories.push(story);
+      story.followCount++;
+      await this.userRepository.save(currentUser);
+    }
+    return story;
+  }
+
+  async unfollowStory(
+    slug: string,
+    currentUserId: number,
+  ): Promise<StoryEntity> {
+    const currentUser = await this.userService.findOneById(currentUserId);
+    const story = await this.storyRepository.findOne({ slug });
+
+    if (!story) {
+      throw new HttpException("Story doesn't exist", HttpStatus.NOT_FOUND);
+    }
+
+    if (story.author.id === currentUserId) {
+      throw new HttpException(
+        'You cannot unfollow yours story',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const idx = currentUser.followStories
+      .map((story) => story.slug)
+      .indexOf(slug);
+
+    if (idx >= 0) {
+      currentUser.followStories.splice(idx, 1);
+      story.followCount--;
+      await this.userRepository.save(currentUser);
+    }
+
+    return story;
+  }
+
+  async favoriteStory(
+    slug: string,
+    currentUserId: number,
+  ): Promise<StoryEntity> {
+    const currentUser = await this.userService.findOneById(currentUserId);
+    const story = await this.storyRepository.findOne({ slug });
+
+    if (!story) {
+      throw new HttpException("Story doesn't exist", HttpStatus.NOT_FOUND);
+    }
+
+    const inFollow = await currentUser.favoriteStories
+      .map((story) => story.slug)
+      .includes(slug);
+
+    if (!inFollow) {
+      currentUser.favoriteStories.push(story);
+      story.favoriteCount++;
+      await this.userRepository.save(currentUser);
+    }
+    return story;
+  }
+
+  async unfavoriteStory(
+    slug: string,
+    currentUserId: number,
+  ): Promise<StoryEntity> {
+    const currentUser = await this.userService.findOneById(currentUserId);
+    const story = await this.storyRepository.findOne({ slug });
+
+    if (!story) {
+      throw new HttpException("Story doesn't exist", HttpStatus.NOT_FOUND);
+    }
+
+    const idx = currentUser.favoriteStories
+      .map((story) => story.slug)
+      .indexOf(slug);
+
+    if (idx >= 0) {
+      currentUser.favoriteStories.splice(idx, 1);
+      story.favoriteCount--;
+      await this.userRepository.save(currentUser);
+    }
+
+    return story;
+  }
+
   async buildResponse(
     story: StoryEntity,
     currentUserId: number,
@@ -250,10 +358,10 @@ export class StoryService {
 
     const currentUser = await this.userService.findOneById(currentUserId);
 
-    const isFavorite = currentUser.followStories
+    const isFavorite = currentUser.favoriteStories
       .map((story) => story.title)
       .includes(story.title);
-    const isFollow = currentUser.favoriteStories
+    const isFollow = currentUser.followStories
       .map((story) => story.title)
       .includes(story.title);
 

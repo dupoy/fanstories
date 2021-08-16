@@ -1,14 +1,9 @@
-import { StoryEntity } from './story.entity';
-import {
-  BeforeInsert,
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
 import { hash } from 'bcrypt';
+import {
+    BeforeInsert, Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn
+} from 'typeorm';
+
+import { StoryEntity } from './story.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -33,15 +28,15 @@ export class UserEntity {
   @OneToMany(() => StoryEntity, (story) => story.author)
   stories: StoryEntity[];
 
-  @ManyToMany(() => UserEntity)
+  @ManyToMany(() => UserEntity, { cascade: true })
   @JoinTable()
   followAuthors: UserEntity[];
 
-  @ManyToMany(() => StoryEntity)
+  @ManyToMany(() => StoryEntity, { cascade: true })
   @JoinTable()
   followStories: StoryEntity[];
 
-  @ManyToMany(() => StoryEntity)
+  @ManyToMany(() => StoryEntity, { cascade: true })
   @JoinTable()
   favoriteStories: StoryEntity[];
 
