@@ -29,6 +29,9 @@ export class StoryEntity {
   @Column({ default: 0 })
   words: number;
 
+  @Column({ default: 0 })
+  pages: number;
+
   @ManyToOne(() => RatingEntity, (rating) => rating.stories, { eager: true })
   rating: RatingEntity;
 
@@ -48,6 +51,9 @@ export class StoryEntity {
   @Column({ default: 0 })
   followCount: number;
 
+  @Column({ default: 0 })
+  viewCount: number;
+
   @Column({ default: false })
   isPublished: boolean;
 
@@ -57,7 +63,6 @@ export class StoryEntity {
   @OneToMany(() => ChapterEntity, (chapter) => chapter.story, {
     onDelete: 'CASCADE',
     eager: true,
-    // cascade: true,
   })
   chapters: ChapterEntity[];
 
@@ -102,6 +107,11 @@ export class StoryEntity {
         return (acc += prev.words);
       }, 0);
     }
+
     return this.words;
+  }
+
+  countViews() {
+    this.chapters.forEach((chapter) => (this.viewCount += chapter.viewCount));
   }
 }

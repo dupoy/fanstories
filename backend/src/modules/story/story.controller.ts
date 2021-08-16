@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 
 import { User } from '../user/decorators/user.decorator';
 import { AuthGuard } from '../user/guards/auth.guard';
 import { SaveStoryDto } from './dto/saveStory.dto';
 import { StoryService } from './story.service';
+import { IFilterQuery } from './types/filterQuery.interface';
+import { IStoriesResponse } from './types/storiesResponse.interface';
 import { IStoryResponse } from './types/storyResponse.interface';
 
 @Controller('stories')
@@ -31,6 +33,14 @@ export class StoryController {
       await this.storyService.findOneBySlug(slug),
       currentUserId,
     );
+  }
+
+  @Get()
+  async getStories(
+    @Query() filterQuery: IFilterQuery,
+    @User('id') currentUserId: number,
+  ): Promise<IStoriesResponse> {
+    return await this.storyService.find(filterQuery, currentUserId);
   }
 
   @Put('/:slug')

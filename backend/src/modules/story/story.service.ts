@@ -11,6 +11,8 @@ import { TagService } from '../tag/tag.service';
 import { UserService } from '../user/user.service';
 import { UtilsService } from '../utils/utils.service';
 import { SaveStoryDto } from './dto/saveStory.dto';
+import { IFilterQuery } from './types/filterQuery.interface';
+import { IStoriesResponse } from './types/storiesResponse.interface';
 import { IStoryResponse } from './types/storyResponse.interface';
 
 @Injectable()
@@ -124,6 +126,115 @@ export class StoryService {
     );
   }
 
+  async find(
+    filterQuery: IFilterQuery,
+    currentUserId: number,
+  ): Promise<IStoriesResponse> {
+    const queryBuilder = this.storyRepository
+      .createQueryBuilder('story')
+      .leftJoinAndSelect('story.tags', 'tags')
+      .leftJoinAndSelect('story.fandoms', 'fandoms')
+      .leftJoinAndSelect('story.author', 'author')
+      .leftJoinAndSelect('story.rating', 'rating')
+      .leftJoinAndSelect('story.focus', 'focus');
+
+    if (filterQuery.title) {
+      const title = filterQuery.title.trim();
+      queryBuilder.andWhere('story.title LIKE :title', {
+        title: `%${title}%`,
+      });
+    }
+
+    if (filterQuery.words) {
+      const words = +filterQuery.words;
+      queryBuilder.andWhere('story.words >= :words', {
+        words,
+      });
+    }
+
+    if (filterQuery.characters) {
+      const characters = filterQuery.characters.split(';');
+      queryBuilder.andWhere('story.characters IN (:...characters)', {
+        characters,
+      });
+    }
+
+    if (filterQuery.pairings) {
+      const pairings = filterQuery.pairings.split(';');
+      queryBuilder.andWhere('story.pairings IN (:...pairings)', {
+        pairings,
+      });
+    }
+
+    if (filterQuery.rating) {
+      const rating = await this.utilsService.findOneByValueRating(
+        filterQuery.rating,
+      );
+      queryBuilder.andWhere('rating.id = :id', {
+        id: rating.id,
+      });
+    }
+
+    if (filterQuery.focus) {
+      const focus = await this.utilsService.findOneByValueFocus(
+        filterQuery.focus,
+      );
+      queryBuilder.andWhere('focus.id = :id', {
+        id: focus.id,
+      });
+    }
+
+    if (filterQuery.fandoms) {
+      const fandomIds = (
+        await this.famdomService.find({
+          titles: filterQuery.fandoms.split(';'),
+        })
+      ).fandoms.map((fandom) => fandom.id);
+      if (fandomIds.length > 0)
+        queryBuilder.andWhere('fandoms.id IN (:...fandoms)', {
+          fandoms: fandomIds,
+        });
+    }
+
+    if (filterQuery.tags) {
+      const tagIds = (
+        await this.tagService.find(filterQuery.tags.split(';'))
+      ).map((tag) => tag.id);
+      if (tagIds.length > 0)
+        queryBuilder.andWhere('tags.id IN (:...tags)', {
+          tags: tagIds,
+        });
+    }
+
+    if (filterQuery.order && filterQuery.sort) {
+      queryBuilder.orderBy({
+        [filterQuery.sort]: filterQuery.order,
+      });
+    }
+
+    const storyCount = await queryBuilder.getCount();
+
+    if (filterQuery.limit) {
+      queryBuilder.limit(filterQuery.limit);
+    }
+
+    if (filterQuery.offset) {
+      queryBuilder.offset(filterQuery.offset);
+    }
+
+    const stories = await queryBuilder.getMany();
+
+    return {
+      stories: await Promise.all(
+        stories.map(async (story) => {
+          delete story.chapters;
+          return (await this.buildResponse(story, currentUserId)).story;
+        }),
+      ),
+      storyCount,
+    };
+  }
+
   async buildResponse(
     story: StoryEntity,
     currentUserId: number,
@@ -149,7 +260,7 @@ export class StoryService {
     return {
       story: {
         ...story,
-        author: this.profileService.buildResponse(profile),
+        author: this.profileService.buildResponse(profile).profile,
         favorite: isFavorite,
         follow: isFollow,
       },

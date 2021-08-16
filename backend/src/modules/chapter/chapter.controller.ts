@@ -1,6 +1,4 @@
-
-
-import { Body, Controller, Delete, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 
 import { IMessage } from '../../types/message.interface';
 import { User } from '../user/decorators/user.decorator';
@@ -12,6 +10,17 @@ import { IChapterResponse } from './types/chapterResponse.interface';
 @Controller('stories/:slug/chapters')
 export class ChapterController {
   constructor(private readonly chapterService: ChapterService) {}
+
+  @Get('/:chapterSlug')
+  async getChapter(
+    @Param('slug') slug: string,
+    @Param('chapterSlug') chapterSlug: string,
+    @User('id') currentUserId: number,
+  ): Promise<IChapterResponse> {
+    return this.chapterService.buildResponse(
+      await this.chapterService.getChapter(slug, chapterSlug, currentUserId),
+    );
+  }
 
   @Post()
   @UseGuards(AuthGuard)

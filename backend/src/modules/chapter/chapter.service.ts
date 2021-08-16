@@ -30,6 +30,13 @@ export class ChapterService {
       { relations: ['chapters'] },
     );
 
+    if (!story) {
+      throw new HttpException(
+        "Story doesn't exist",
+        HttpStatus.NOT_IMPLEMENTED,
+      );
+    }
+
     if (story.author.id !== currentUserId) {
       throw new HttpException(
         'You cannot add chapter to this story',
@@ -55,7 +62,43 @@ export class ChapterService {
 
     story.chapters.push(chapter);
     story.words = story.countWords();
+    story.pages = Math.ceil(story.words / 400);
     await this.storyRepository.save(story);
+
+    return chapter;
+  }
+
+  async getChapter(
+    slug: string,
+    chapterSlug: string,
+    currentUserId: number,
+  ): Promise<ChapterEntity> {
+    const story = await this.storyRepository.findOne(
+      { slug },
+      { relations: ['chapters'] },
+    );
+
+    if (!story) {
+      throw new HttpException(
+        "Story doesn't exist",
+        HttpStatus.NOT_IMPLEMENTED,
+      );
+    }
+
+    const chapter = story.chapters.find(
+      (chapter) => chapter.slug === chapterSlug,
+    );
+
+    if (!chapter) {
+      throw new HttpException("Chapter didn't exist", HttpStatus.NOT_FOUND);
+    }
+
+    if (story.author.id !== currentUserId) {
+      chapter.increaseViews();
+      await this.chapterRepository.save(chapter);
+      story.countViews();
+      await this.storyRepository.save(story);
+    }
 
     return chapter;
   }
@@ -70,6 +113,13 @@ export class ChapterService {
       { slug },
       { relations: ['chapters'] },
     );
+
+    if (!story) {
+      throw new HttpException(
+        "Story doesn't exist",
+        HttpStatus.NOT_IMPLEMENTED,
+      );
+    }
 
     if (story.author.id !== currentUserId) {
       throw new HttpException(
@@ -102,6 +152,7 @@ export class ChapterService {
     );
 
     story.words = story.countWords();
+    story.pages = Math.ceil(story.words / 400);
     await this.storyRepository.save(story);
 
     return chapter;
@@ -116,6 +167,13 @@ export class ChapterService {
       { slug },
       { relations: ['chapters'] },
     );
+
+    if (!story) {
+      throw new HttpException(
+        "Story doesn't exist",
+        HttpStatus.NOT_IMPLEMENTED,
+      );
+    }
 
     if (story.author.id !== currentUserId) {
       throw new HttpException(
@@ -134,6 +192,7 @@ export class ChapterService {
 
     story.chapters = story.chapters.filter(({ id }) => id !== chapter.id);
     story.words = story.countWords();
+    story.pages = Math.ceil(story.words / 400);
     await this.storyRepository.save(story);
 
     return { success: 'Successfully delete chapter' };

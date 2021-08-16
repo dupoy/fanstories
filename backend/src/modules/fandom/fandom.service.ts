@@ -52,7 +52,7 @@ export class FandomService {
     return fandom;
   }
 
-  async find(queryParams?: QueryParams): Promise<IFandomsResponse> {
+  async find(queryParams: QueryParams): Promise<IFandomsResponse> {
     const fandoms = await this.fandomRepository.find({
       relations: ['characters'],
       where: {

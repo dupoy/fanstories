@@ -22,6 +22,9 @@ export class ChapterEntity {
   @Column({ default: 0 })
   words: number;
 
+  @Column({ default: 0 })
+  viewCount: number;
+
   @ManyToOne(() => StoryEntity, (story) => story.chapters)
   story: StoryEntity;
 
@@ -49,5 +52,9 @@ export class ChapterEntity {
   @BeforeUpdate()
   countWords() {
     this.words = this.body.replace(/[^a-zа-яё\s]/gi, '').split(' ').length;
+  }
+
+  increaseViews() {
+    this.viewCount += 1;
   }
 }
