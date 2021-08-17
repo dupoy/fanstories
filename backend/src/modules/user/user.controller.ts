@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 
 import { User } from './decorators/user.decorator';
 import { CreateUserDto } from './dto/createUser.dto';
 import { LoginUserDto } from './dto/loginUser.dto';
+import { AuthGuard } from './guards/auth.guard';
 import { IUserResponse } from './types/userResponse.interface';
 import { UserService } from './user.service';
 
@@ -29,6 +30,7 @@ export class UserController {
   }
 
   @Get('/auth')
+  @UseGuards(AuthGuard)
   async getCurrentUser(
     @User('id') currentUserId: number
   ): Promise<IUserResponse> {

@@ -4,6 +4,7 @@ import { isAnonymousSelector } from 'src/app/auth/store/selectors';
 import { Component, OnInit } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 
+import { logoutAction } from '../../../../../auth/store/action/sync.action';
 import { currentUserSelector, isLoggedInSelector } from '../../../../../auth/store/selectors';
 import { ICurrentUser } from '../../../../types/current-user.interface';
 
@@ -27,5 +28,9 @@ export class TopNavigationComponent implements OnInit {
     this.isAnonymous$ = this.store.pipe(select(isAnonymousSelector))
     this.isLoggedIn$ = this.store.pipe(select(isLoggedInSelector))
     this.currentUser$ = this.store.pipe(select(currentUserSelector))
+  }
+
+  logout() {
+    this.store.dispatch(logoutAction())
   }
 }

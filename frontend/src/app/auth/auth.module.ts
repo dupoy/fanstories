@@ -14,6 +14,7 @@ import { RegisterComponent } from './components/register/register.component';
 import { AuthService } from './services/auth.service';
 import { GetCurrentUserEffect } from './store/effects/get-current-user.effect';
 import { LoginEffect } from './store/effects/login.effect';
+import { LogoutEffect } from './store/effects/logout.effect';
 import { RegisterEffect } from './store/effects/register.effect';
 import { reducer } from './store/reducers';
 
@@ -36,6 +37,7 @@ const routes: Routes = [
       LoginEffect,
       RegisterEffect,
       GetCurrentUserEffect,
+      LogoutEffect,
     ]),
   ],
   providers: [AuthService, PersistenceService],

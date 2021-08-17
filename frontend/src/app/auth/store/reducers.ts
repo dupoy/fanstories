@@ -8,6 +8,7 @@ import { loginAction, loginFailureAction, loginSuccessAction } from './action/lo
 import {
     registerAction, registerFailureAction, registerSuccessAction
 } from './action/register.action';
+import { logoutAction } from './action/sync.action';
 
 const initialState: IAuthState = {
   isSubmitting: false,
@@ -92,6 +93,10 @@ const authReducer = createReducer(
       isLoading: false,
       isLoggedIn: false,
     })
+  ),
+  on(
+    logoutAction,
+    (state): IAuthState => ({...initialState, isLoggedIn: false})
   )
 )
 
