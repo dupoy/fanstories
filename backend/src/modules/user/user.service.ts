@@ -14,33 +14,33 @@ import { IUserResponse } from './types/userResponse.interface';
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+    private readonly userRepository: Repository<UserEntity>
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
     let condidate = await this.userRepository.findOne({
       email: createUserDto.email,
-    });
+    })
 
     if (condidate) {
       throw new HttpException(
         'User with this email is already exist',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+        HttpStatus.UNPROCESSABLE_ENTITY
+      )
     }
 
     condidate = await this.userRepository.findOne({
       username: createUserDto.username,
-    });
+    })
 
     if (condidate) {
       throw new HttpException(
         'User with this username is already exist',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+        HttpStatus.UNPROCESSABLE_ENTITY
+      )
     }
-    const user = this.userRepository.create(createUserDto);
-    return this.userRepository.save(user);
+    const user = this.userRepository.create(createUserDto)
+    return this.userRepository.save(user)
   }
 
   async loginUser(loginUserDto: LoginUserDto): Promise<UserEntity> {
@@ -48,49 +48,51 @@ export class UserService {
       {
         email: loginUserDto.email,
       },
-      { select: ['id', 'email', 'username', 'bio', 'image', 'password'] },
-    );
+      {select: ['id', 'email', 'username', 'bio', 'image', 'password']}
+    )
 
     if (!condidate) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
     }
 
     const isPasswordMatch = await compare(
       loginUserDto.password,
-      condidate.password,
-    );
+      condidate.password
+    )
 
     if (!isPasswordMatch) {
       throw new HttpException(
         'Password mismatch',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+        HttpStatus.UNPROCESSABLE_ENTITY
+      )
     }
 
-    return condidate;
+    return condidate
   }
 
   async findOneById(currentUserId: number): Promise<UserEntity> {
     return this.userRepository.findOne(currentUserId, {
       relations: ['followStories', 'favoriteStories'],
-    });
+    })
   }
 
   async find(betas: string[]): Promise<UserEntity[]> {
-    return this.userRepository.find({ username: In(betas) });
+    return this.userRepository.find({username: In(betas)})
   }
 
   buildResponse(user: UserEntity): IUserResponse {
-    delete user.password;
+    delete user.password
+    delete user.favoriteStories
+    delete user.followStories
     return {
       user: {
         ...user,
         token: this.generateJwt(user),
       },
-    };
+    }
   }
 
-  private generateJwt({ id, username, email }: UserEntity): string {
-    return sign({ id, username, email }, process.env.JWT_SECRET);
+  private generateJwt({id, username, email}: UserEntity): string {
+    return sign({id, username, email}, process.env.JWT_SECRET)
   }
 }
