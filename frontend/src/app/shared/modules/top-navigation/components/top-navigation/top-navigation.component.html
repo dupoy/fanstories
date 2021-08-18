@@ -1,82 +1,134 @@
 <nav class="navbar navbar-light navbar-expand-lg bg-light">
   <div class="container">
-    <a class="navbar-brand">Fanstories</a>
+    <a class="navbar-brand" routerLink="/">Fanstories</a>
     <button
       class="navbar-toggler"
       type="button"
       data-bs-toggle="offcanvas"
-      data-bs-target="#navbarOffcanvasLg"
-      aria-controls="navbarOffcanvasLg"
+      data-bs-target="#offcanvasExample"
+      aria-controls="offcanvasExample"
     >
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div
-      class="offcanvas offcanvas-end"
-      tabindex="-1"
-      id="navbarOffcanvasLg"
-      aria-labelledby="navbarOffcanvasLgLabel"
-    >
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Offcanvas</h5>
-        <button
-          type="button"
-          class="btn-close text-reset"
-          data-bs-dismiss="offcanvas"
-          aria-label="Close"
-        ></button>
-      </div>
-      <div class="offcanvas-body">
-        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-          <ng-container *ngIf="isAnonymous$ | async">
-            <li class="nav-item">
-              <a
-                routerLink="register"
-                routerLinkActive="active"
-                class="nav-link"
-                aria-current="page"
-              >
-                Sign-up
-              </a>
-            </li>
-            <li class="nav-item">
-              <a routerLink="login" routerLinkActive="active" class="nav-link">
-                Sign-in
-              </a>
-            </li>
-          </ng-container>
-          <ng-container *ngIf="isLoggedIn$ | async">
-            <li class="nav-item dropdown">
-              <a
-                type="button"
-                class="nav-link dropdown-toggle"
-                data-bs-toggle="dropdown"
-                data-bs-display="static"
-                aria-expanded="false"
-              >
-                <img
-                  src="{{ (currentUser$ | async)?.image }}"
-                  width="32"
-                  height="32"
-                  class="rounded-circle"
-                />
-              </a>
-              <ul
-                class="dropdown-menu dropdown-menu-end dropdown-menu-lg-start"
-              >
-                <li>
-                  <button
-                    class="dropdown-item"
-                    type="button"
-                    (click)="logout()"
-                  >
-                    Logout
-                  </button>
-                </li>
-              </ul>
-            </li>
-          </ng-container>
-        </ul>
-      </div>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <ng-container
+          *ngIf="(isLoggedIn$ | async) && (currentUser$ | async) as currentUser"
+        >
+          <a routerLink="/stories/add" class="nav-link">
+            <i class="bi bi-pencil"></i
+          ></a>
+          <a routerLink="/stories" class="nav-link">
+            <i class="bi bi-layout-text-sidebar"></i>
+          </a>
+          <a class="nav-link" routerLink="profile/followed">
+            <i class="bi bi-bell"></i>
+          </a>
+          <a class="nav-link" routerLink="profile/favorited">
+            <i class="bi bi-bookmark"></i>
+          </a>
+          <a routerLink="/profile" class="nav-link">
+            <img
+              src="{{ currentUser.image }}"
+              height="32"
+              class="rounded-circle border"
+              alt="ppf"
+            />
+          </a>
+        </ng-container>
+      </ul>
     </div>
   </div>
 </nav>
+
+<div
+  class="offcanvas offcanvas-start"
+  tabindex="-1"
+  id="offcanvasExample"
+  aria-labelledby="offcanvasExampleLabel"
+  #offcanvas
+>
+  <div class="offcanvas-header justify-content-around align-items-start">
+    <ng-container *ngIf="isAnonymous$ | async">
+      <a class="btn btn-outline-secondary btn-sm" routerLink="register">
+        Sign Up
+      </a>
+      <a class="btn btn-sm" routerLink="login">Sign In</a>
+    </ng-container>
+    <ng-container
+      *ngIf="(isLoggedIn$ | async) && (currentUser$ | async) as currentUser"
+    >
+      <a class="p-2 text-dark" routerLink="profile/followed">
+        <i class="bi bi-bell fs-4"></i
+      ></a>
+      <div>
+        <img
+          src="{{ currentUser.image }}"
+          height="48"
+          class="rounded-circle border"
+          alt="ppf"
+        />
+        <p class="text-center m-0">
+          <a class="text-decoration-none text-dark fs-5" routerLink="profile">{{
+            currentUser.username
+          }}</a>
+        </p>
+      </div>
+      <a class="p-2 text-dark" routerLink="profile/favorited">
+        <i class="bi bi-bookmark fs-4"></i
+      ></a>
+    </ng-container>
+  </div>
+  <div class="offcanvas-body p-0">
+    <ul class="list-group">
+      <a
+        class="list-group-item list-group-item-action"
+        routerLink="/"
+        routerLinkActive="active"
+      >
+        <i class="bi bi-house"></i>
+        <span class="px-2">Home</span>
+      </a>
+      <ng-container *ngIf="isLoggedIn$ | async">
+        <a
+          class="list-group-item list-group-item-action"
+          routerLink="profile"
+          routerLinkActive="active"
+        >
+          <i class="bi bi-person"></i>
+          <span class="px-2">Profile</span>
+        </a>
+        <a
+          class="list-group-item list-group-item-action"
+          routerLink="stories/add"
+          routerLinkActive="active"
+        >
+          <i class="bi bi-pencil"></i>
+          <span class="px-2">Add story</span>
+        </a>
+        <a
+          class="list-group-item list-group-item-action"
+          routerLink="stories"
+          routerLinkActive="active"
+        >
+          <i class="bi bi-layout-text-sidebar"></i>
+          <span class="px-2">My Stories</span>
+        </a>
+      </ng-container>
+      <!-- <ng-container *ngIf="isAnonymous$ | async"> </ng-container> -->
+    </ul>
+  </div>
+  <div class="offcanvas-footer p-0">
+    <ul class="list-group">
+      <ng-container *ngIf="isLoggedIn$ | async">
+        <li
+          class="list-group-item list-group-item-action fs-5"
+          (click)="logout()"
+        >
+          <i class="bi bi-box-arrow-right fs-5"></i>
+          Logout
+        </li>
+      </ng-container>
+    </ul>
+  </div>
+</div>

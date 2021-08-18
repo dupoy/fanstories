@@ -1,11 +1,13 @@
 import { Observable } from 'rxjs';
 import { isAnonymousSelector } from 'src/app/auth/store/selectors';
 
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { NavigationStart, Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 
 import { logoutAction } from '../../../../../auth/store/action/sync.action';
 import { currentUserSelector, isLoggedInSelector } from '../../../../../auth/store/selectors';
+import { BoostrapService, BootstrapInstance } from '../../../../services/boostrap.service';
 import { ICurrentUser } from '../../../../types/current-user.interface';
 
 @Component({
@@ -13,15 +15,24 @@ import { ICurrentUser } from '../../../../types/current-user.interface';
   templateUrl: './top-navigation.component.html',
   styleUrls: ['./top-navigation.component.scss'],
 })
-export class TopNavigationComponent implements OnInit {
+export class TopNavigationComponent implements OnInit, AfterViewInit {
   isLoggedIn$!: Observable<boolean | null>
   isAnonymous$!: Observable<boolean | null>
   currentUser$!: Observable<ICurrentUser | null>
 
-  constructor(private readonly store: Store) {}
+  @ViewChild('offcanvas') offcanvasElement!: ElementRef
+
+  offcanvas!: BootstrapInstance
+
+  constructor(private readonly store: Store, private readonly router: Router) {}
 
   ngOnInit(): void {
     this.initializeValues()
+    this.initializeListeners()
+  }
+
+  ngAfterViewInit(): void {
+    this.offcanvas = BoostrapService.initializeCanvas(this.offcanvasElement)
   }
 
   initializeValues() {
@@ -30,7 +41,16 @@ export class TopNavigationComponent implements OnInit {
     this.currentUser$ = this.store.pipe(select(currentUserSelector))
   }
 
+  initializeListeners(): void {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationStart) {
+        this.offcanvas.hide()
+      }
+    })
+  }
+
   logout() {
     this.store.dispatch(logoutAction())
+    this.offcanvas.hide()
   }
 }

@@ -21,7 +21,7 @@ export class LogoutEffect {
         ofType(logoutAction),
         tap(() => {
           this.persistenseService.set('accessToken', '')
-          this.router.navigate(['/'])
+          this.router.navigateByUrl('/')
         })
       ),
     {dispatch: false}

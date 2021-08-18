@@ -1,0 +1,15 @@
+.offcanvas {
+  max-width: 300px;
+}
+
+.offcanvas-link {
+  text-decoration: none;
+  color: #212529;
+}
+
+.active {
+  background-color: #f8f9fa;
+  color: #212529;
+  border: none;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+}
