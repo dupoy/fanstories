@@ -121,11 +121,8 @@
   <div class="offcanvas-footer p-0">
     <ul class="list-group">
       <ng-container *ngIf="isLoggedIn$ | async">
-        <li
-          class="list-group-item list-group-item-action fs-5"
-          (click)="logout()"
-        >
-          <i class="bi bi-box-arrow-right fs-5"></i>
+        <li class="list-group-item list-group-item-action" (click)="logout()">
+          <i class="bi bi-box-arrow-right"></i>
           Logout
         </li>
       </ng-container>

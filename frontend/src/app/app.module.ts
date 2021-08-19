@@ -9,6 +9,7 @@ import { StoreRouterConnectingModule } from '@ngrx/router-store';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
+import { AllStoriesModule } from './all-stories/all-stories.module';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthModule } from './auth/auth.module';
@@ -21,6 +22,7 @@ import { AuthInterceptor } from './shared/services/auth.interceptor';
     BrowserModule,
     AppRoutingModule,
     AuthModule,
+    AllStoriesModule,
     TopNavigationModule,
     StoreModule.forRoot([]),
     EffectsModule.forRoot([]),
