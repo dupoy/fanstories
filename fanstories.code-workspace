@@ -1,0 +1,14 @@
+{
+  "folders": [
+    {
+      "path": "frontend"
+    },
+    {
+      "name": "backend",
+      "path": "backend"
+    }
+  ],
+  "settings": {
+    "vsicons.presets.angular": true
+  }
+}

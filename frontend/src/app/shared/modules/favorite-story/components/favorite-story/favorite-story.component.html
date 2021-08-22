@@ -1,0 +1,14 @@
+<button
+  type="button"
+  [ngClass]="{
+    btn: true,
+    'btn-sm': true,
+    'btn-success': isFavorite,
+    'btn-light border-secondary': !isFavorite,
+    'me-2': true
+  }"
+  (click)="handleLike()"
+>
+  <i class="bi bi-bookmark"></i>
+  &nbsp;{{ favoriteCount }}
+</button>

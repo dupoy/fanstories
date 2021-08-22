@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 
 import { Component, Input, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 
 import { getStoriesAction } from '../../store/actions/get-stories.action';
@@ -20,11 +20,7 @@ export class StoriesComponent implements OnInit {
   error$!: Observable<string | null>
   stories$!: Observable<IGetStoriesResponse | null>
 
-  constructor(
-    private readonly store: Store,
-    private router: Router,
-    protected route: ActivatedRoute
-  ) {}
+  constructor(private readonly store: Store, protected route: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.initializeValues()

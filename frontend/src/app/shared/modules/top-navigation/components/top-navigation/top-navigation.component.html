@@ -15,26 +15,53 @@
         <ng-container
           *ngIf="(isLoggedIn$ | async) && (currentUser$ | async) as currentUser"
         >
-          <a routerLink="/stories/add" class="nav-link">
-            <i class="bi bi-pencil"></i
-          ></a>
-          <a routerLink="/stories" class="nav-link">
-            <i class="bi bi-layout-text-sidebar"></i>
-          </a>
-          <a class="nav-link" routerLink="profile/followed">
-            <i class="bi bi-bell"></i>
-          </a>
-          <a class="nav-link" routerLink="profile/favorited">
-            <i class="bi bi-bookmark"></i>
-          </a>
-          <a routerLink="/profile" class="nav-link">
-            <img
-              src="{{ currentUser.image }}"
-              height="32"
-              class="rounded-circle border"
-              alt="ppf"
-            />
-          </a>
+          <li class="nav-item">
+            <a routerLink="" class="nav-link"> <i class="bi bi-pencil"></i></a>
+          </li>
+          <li>
+            <a routerLink="" class="nav-link">
+              <i class="bi bi-layout-text-sidebar"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="">
+              <i class="bi bi-bell"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="">
+              <i class="bi bi-bookmark"></i>
+            </a>
+          </li>
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link"
+              id="navbarDropdown"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <img
+                src="{{ currentUser.image }}"
+                height="32"
+                class="rounded-circle border"
+                alt="ppf"
+              />
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li>
+                <a class="dropdown-item" routerLink=""
+                  ><i class="bi bi-person"></i> Profile</a
+                >
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <a class="dropdown-item" (click)="logout()">
+                  <i class="bi bi-box-arrow-right"></i> Logout</a
+                >
+              </li>
+            </ul>
+          </li>
         </ng-container>
       </ul>
     </div>
@@ -58,7 +85,7 @@
     <ng-container
       *ngIf="(isLoggedIn$ | async) && (currentUser$ | async) as currentUser"
     >
-      <a class="p-2 text-dark" routerLink="profile/followed">
+      <a class="p-2 text-dark" routerLink="">
         <i class="bi bi-bell fs-4"></i
       ></a>
       <div>
@@ -69,12 +96,12 @@
           alt="ppf"
         />
         <p class="text-center m-0">
-          <a class="text-decoration-none text-dark fs-5" routerLink="profile">{{
+          <a class="text-decoration-none text-dark fs-5" routerLink="">{{
             currentUser.username
           }}</a>
         </p>
       </div>
-      <a class="p-2 text-dark" routerLink="profile/favorited">
+      <a class="p-2 text-dark" routerLink="">
         <i class="bi bi-bookmark fs-4"></i
       ></a>
     </ng-container>
@@ -92,7 +119,7 @@
       <ng-container *ngIf="isLoggedIn$ | async">
         <a
           class="list-group-item list-group-item-action"
-          routerLink="profile"
+          routerLink=""
           routerLinkActive="active"
         >
           <i class="bi bi-person"></i>
@@ -100,7 +127,7 @@
         </a>
         <a
           class="list-group-item list-group-item-action"
-          routerLink="stories/add"
+          routerLink=""
           routerLinkActive="active"
         >
           <i class="bi bi-pencil"></i>
@@ -108,7 +135,7 @@
         </a>
         <a
           class="list-group-item list-group-item-action"
-          routerLink="stories"
+          routerLink=""
           routerLinkActive="active"
         >
           <i class="bi bi-layout-text-sidebar"></i>

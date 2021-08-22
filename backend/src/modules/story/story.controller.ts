@@ -16,94 +16,94 @@ export class StoryController {
   @UseGuards(AuthGuard)
   async createStory(
     @Body('story') createStoryDto: SaveStoryDto,
-    @User('id') currentUserId: number,
+    @User('id') currentUserId: number
   ): Promise<IStoryResponse> {
     return this.storyService.buildResponse(
       await this.storyService.createStory(createStoryDto, currentUserId),
-      currentUserId,
-    );
+      currentUserId
+    )
   }
 
   @Get('/:slug')
   async getStory(
     @Param('slug') slug: string,
-    @User('id') currentUserId: number,
+    @User('id') currentUserId: number
   ): Promise<IStoryResponse> {
     return this.storyService.buildResponse(
       await this.storyService.findOneBySlug(slug),
-      currentUserId,
-    );
+      currentUserId
+    )
   }
 
   @Get()
   async getStories(
     @Query() filterQuery: IFilterQuery,
-    @User('id') currentUserId: number,
+    @User('id') currentUserId: number
   ): Promise<IStoriesResponse> {
-    return await this.storyService.find(filterQuery, currentUserId);
+    return await this.storyService.find(filterQuery, currentUserId)
   }
 
   @Put('/:slug')
   async updateStory(
     @Param('slug') slug: string,
     @User('id') currentUserId: number,
-    @Body('story') updateStoryDto: SaveStoryDto,
+    @Body('story') updateStoryDto: SaveStoryDto
   ): Promise<IStoryResponse> {
     return this.storyService.buildResponse(
       await this.storyService.findOneBySlugAndUpdate(
         updateStoryDto,
         slug,
-        currentUserId,
+        currentUserId
       ),
-      currentUserId,
-    );
+      currentUserId
+    )
   }
 
   @Post('/:slug/follow')
   @UseGuards(AuthGuard)
   async followStory(
     @Param('slug') slug: string,
-    @User('id') currentUserId: number,
+    @User('id') currentUserId: number
   ): Promise<IStoryResponse> {
     return this.storyService.buildResponse(
       await this.storyService.followStory(slug, currentUserId),
-      currentUserId,
-    );
+      currentUserId
+    )
   }
 
-  @Delete('/:slug/unfollow')
+  @Delete('/:slug/follow')
   @UseGuards(AuthGuard)
   async unfollowStory(
     @Param('slug') slug: string,
-    @User('id') currentUserId: number,
+    @User('id') currentUserId: number
   ): Promise<IStoryResponse> {
     return this.storyService.buildResponse(
       await this.storyService.unfollowStory(slug, currentUserId),
-      currentUserId,
-    );
+      currentUserId
+    )
   }
 
   @Post('/:slug/favorite')
   @UseGuards(AuthGuard)
   async favoriteStory(
     @Param('slug') slug: string,
-    @User('id') currentUserId: number,
+    @User('id') currentUserId: number
   ): Promise<IStoryResponse> {
     return this.storyService.buildResponse(
       await this.storyService.favoriteStory(slug, currentUserId),
-      currentUserId,
-    );
+      currentUserId
+    )
   }
 
-  @Delete('/:slug/unfavorite')
+  @Delete('/:slug/favorite')
   @UseGuards(AuthGuard)
   async unfavoriteStory(
     @Param('slug') slug: string,
-    @User('id') currentUserId: number,
+    @User('id') currentUserId: number
   ): Promise<IStoryResponse> {
     return this.storyService.buildResponse(
       await this.storyService.unfavoriteStory(slug, currentUserId),
-      currentUserId,
-    );
+      currentUserId
+    )
   }
 }

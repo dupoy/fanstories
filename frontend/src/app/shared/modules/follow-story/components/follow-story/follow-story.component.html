@@ -1,0 +1,14 @@
+<button
+  type="button"
+  [ngClass]="{
+    btn: true,
+    'btn-sm': true,
+    'btn-success': isFollow,
+    'btn-light border-secondary': !isFollow,
+    'me-2': true
+  }"
+  (click)="handleFollow()"
+>
+  <i class="bi bi-bell"></i>
+  &nbsp;{{ followCount }}
+</button>
