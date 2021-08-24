@@ -14,6 +14,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthModule } from './auth/auth.module';
 import { FandomsModule } from './shared/modules/fandoms/fandoms.module';
+import { TagsModule } from './shared/modules/tags/tags.module';
 import { TopNavigationModule } from './shared/modules/top-navigation/top-navigation.module';
 import { AuthInterceptor } from './shared/services/auth.interceptor';
 import { UserProfileModule } from './user-profile/user-profile.module';
@@ -28,6 +29,7 @@ import { UserProfileModule } from './user-profile/user-profile.module';
     TopNavigationModule,
     UserProfileModule,
     FandomsModule,
+    TagsModule,
     StoreModule.forRoot([]),
     EffectsModule.forRoot([]),
     StoreRouterConnectingModule.forRoot(),

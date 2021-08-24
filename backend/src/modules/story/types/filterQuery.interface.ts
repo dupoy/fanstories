@@ -12,7 +12,9 @@ export interface IFilterQuery {
   focus?: string
   title?: string
   characters?: string
+  excludeCharacters?: string
   pairings?: string
+  excludePairings?: string
   words?: number
   sort?: string
   order?: 'ASC' | 'DESC'

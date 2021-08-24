@@ -71,6 +71,20 @@
       </select>
     </div>
   </div>
+  <div class="mb-3">
+    <label for="tags" class="form-label">Tags</label>
+    <select
+      id="tags"
+      class="form-select"
+      multiple
+      aria-label="multiple select"
+      formControlName="tags"
+    >
+      <option *ngFor="let tag of (tags$ | async)?.tags" [value]="tag.title">
+        {{ tag.title }}
+      </option>
+    </select>
+  </div>
   <button type="submit" class="me-2 btn btn-sm btn-secondary">Filter</button>
   <button
     type="submit"

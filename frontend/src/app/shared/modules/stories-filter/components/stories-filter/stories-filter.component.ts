@@ -10,6 +10,9 @@ import { IFilters } from '../../../../types/filters.interface';
 import { getFandomsAction } from '../../../fandoms/store/actions/get-fandoms.action';
 import { fandomsSelector } from '../../../fandoms/store/selectors';
 import { IGetFandomResponse } from '../../../fandoms/types/get-fandoms-response.interface';
+import { getTagsActions } from '../../../tags/store/actions/get-tags.actions';
+import { tagsSelector } from '../../../tags/store/selectors';
+import { IGetTagsResponse } from '../../../tags/types/get-tags-response.interface';
 
 @Component({
   selector: 'app-stories-filter',
@@ -21,6 +24,8 @@ export class StoriesFilterComponent implements OnInit {
   form!: FormGroup
 
   fandoms$!: Observable<IGetFandomResponse | null>
+  tags$!: Observable<IGetTagsResponse | null>
+
   characters: ICharacter[] = []
 
   get pairings() {
@@ -37,10 +42,12 @@ export class StoriesFilterComponent implements OnInit {
 
   initializeValues(): void {
     this.fandoms$ = this.store.pipe(select(fandomsSelector))
+    this.tags$ = this.store.pipe(select(tagsSelector))
   }
 
   fetchData(): void {
     this.store.dispatch(getFandomsAction())
+    this.store.dispatch(getTagsActions())
   }
 
   initializeForm(): void {
@@ -50,6 +57,7 @@ export class StoriesFilterComponent implements OnInit {
       fandoms: new FormControl(null),
       characters: new FormControl(null),
       pairings: new FormArray([]),
+      tags: new FormControl(null),
     })
   }
 
@@ -65,6 +73,7 @@ export class StoriesFilterComponent implements OnInit {
         ?.map((pairing: string[]) => pairing.join('/'))
         ?.map((pairing: string) => `[${pairing}]`)
         ?.join(';'),
+      tags: this.form.value['tags']?.join(';'),
     }
 
     console.log(filters)

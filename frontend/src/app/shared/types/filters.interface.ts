@@ -4,4 +4,5 @@ export interface IFilters {
   fandoms: string
   characters: string
   pairings: string
+  tags: string
 }

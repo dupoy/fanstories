@@ -221,9 +221,25 @@ export class StoryService {
       )
     }
 
+    if (filterQuery.excludeCharacters) {
+      const characters = filterQuery.excludeCharacters.split(';')
+
+      queryBuilder.andWhere('story.characters NOT IN (:characters)', {
+        characters,
+      })
+    }
+
     if (filterQuery.pairings) {
       const pairings = filterQuery.pairings.split(';')
       queryBuilder.andWhere('story.pairings::text[] @> (:pairings)::text[]', {
+        pairings,
+      })
+    }
+
+    if (filterQuery.excludePairings) {
+      const pairings = filterQuery.excludePairings.split(';')
+
+      queryBuilder.andWhere('story.pairings NOT IN (:pairings)', {
         pairings,
       })
     }
@@ -263,12 +279,35 @@ export class StoryService {
         })
     }
 
+    if (filterQuery.excludeFandoms) {
+      const fandomIds = (
+        await this.famdomService.find({
+          titles: filterQuery.excludeFandoms.split(';'),
+        })
+      ).fandoms.map((fandom) => fandom.id)
+
+      if (fandomIds.length > 0)
+        queryBuilder.andWhere('fandoms.id NOT IN (:...fandoms)', {
+          fandoms: fandomIds,
+        })
+    }
+
     if (filterQuery.tags) {
       const tagIds = (
         await this.tagService.find(filterQuery.tags.split(';'))
       ).map((tag) => tag.id)
       if (tagIds.length > 0)
         queryBuilder.andWhere('tags.id IN (:...tags)', {
+          tags: tagIds,
+        })
+    }
+
+    if (filterQuery.excludeTags) {
+      const tagIds = (
+        await this.tagService.find(filterQuery.excludeTags.split(';'))
+      ).map((tag) => tag.id)
+      if (tagIds.length > 0)
+        queryBuilder.andWhere('tags.id NOT IN (:...tags)', {
           tags: tagIds,
         })
     }
