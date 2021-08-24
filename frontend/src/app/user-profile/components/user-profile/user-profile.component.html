@@ -1,0 +1,59 @@
+<ng-container *ngIf="userProfile">
+  <div class="container-fluid profile-info">
+    <div class="container">
+      <div class="row">
+        <img
+          class="mt-4 mx-auto rounded-circle profile-image"
+          src="{{ userProfile.image }}"
+        />
+        <div class="text-center">
+          <h3>{{ userProfile.username }}</h3>
+          <p>{{ userProfile.bio }}</p>
+        </div>
+        <div class="d-flex">
+          <app-follow-user
+            *ngIf="!(isCurrentUserProfile$ | async)"
+            class="ms-auto"
+            [isFollow]="userProfile.following"
+            [profileUsername]="userProfile.username"
+          ></app-follow-user>
+          <button
+            *ngIf="isCurrentUserProfile$ | async"
+            class="ms-auto btn btn-outline-light text-dark"
+          >
+            <i class="bi bi-gear"></i>
+            Settings
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container mt-4">
+    <div class="mb-3">
+      <a
+        class="text-decoration-none px-3 pb-2"
+        [routerLink]="['/profiles', userProfile.username]"
+        routerLinkActive="active-toggler"
+        [routerLinkActiveOptions]="{exact: true}"
+        >My stories</a
+      >
+      <a
+        class="text-decoration-none px-3 pb-2"
+        [routerLink]="['/profiles', userProfile.username, 'favorites']"
+        routerLinkActive="active-toggler"
+        [routerLinkActiveOptions]="{exact: true}"
+        >Favorited</a
+      >
+      <a
+        *ngIf="isCurrentUserProfile$ | async"
+        class="text-decoration-none px-3 pb-2"
+        [routerLink]="['/profiles', userProfile.username, 'followes']"
+        routerLinkActive="active-toggler"
+        [routerLinkActiveOptions]="{exact: true}"
+        >Followed</a
+      >
+      <hr class="line" />
+    </div>
+    <app-stories [apiUrl]="apiUrl"></app-stories>
+  </div>
+</ng-container>

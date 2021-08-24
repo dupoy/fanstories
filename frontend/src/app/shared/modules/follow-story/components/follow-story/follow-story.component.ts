@@ -1,5 +1,4 @@
 import { currentUserSelector } from 'src/app/auth/store/selectors';
-import { ICurrentUser } from 'src/app/shared/types/current-user.interface';
 
 import { Component, Input, OnInit } from '@angular/core';
 import { select, Store } from '@ngrx/store';
@@ -19,8 +18,7 @@ export class FollowStoryComponent implements OnInit {
 
   followCount!: number
   isFollow!: boolean
-
-  currentUser!: ICurrentUser | null
+  isAuthor!: boolean
 
   constructor(private readonly store: Store) {}
 
@@ -33,7 +31,10 @@ export class FollowStoryComponent implements OnInit {
     this.isFollow = this.isFollowProps
     this.store
       .pipe(select(currentUserSelector))
-      .subscribe((currentUser) => (this.currentUser = currentUser))
+      .subscribe(
+        (currentUser) =>
+          (this.isAuthor = this.storyAuthorProps === currentUser?.username)
+      )
       .unsubscribe()
   }
 
@@ -45,9 +46,7 @@ export class FollowStoryComponent implements OnInit {
       })
     )
 
-    if (this.storyAuthorProps !== this.currentUser?.username) {
-      this.isFollow ? this.followCount-- : this.followCount++
-      this.isFollow = !this.isFollow
-    }
+    this.isFollow ? this.followCount-- : this.followCount++
+    this.isFollow = !this.isFollow
   }
 }

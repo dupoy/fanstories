@@ -1,7 +1,9 @@
+import { parseUrl, stringify } from 'query-string';
 import { Observable } from 'rxjs';
+import { IFilters } from 'src/app/shared/types/filters.interface';
 
-import { Component, Input, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 
 import { getStoriesAction } from '../../store/actions/get-stories.action';
@@ -13,23 +15,46 @@ import { IGetStoriesResponse } from '../../types/get-stories-response.interface'
   templateUrl: './stories.component.html',
   styleUrls: ['./stories.component.scss'],
 })
-export class StoriesComponent implements OnInit {
+export class StoriesComponent implements OnInit, OnChanges {
   @Input('apiUrl') apiUrlProps!: string
 
   isLoading$!: Observable<boolean>
   error$!: Observable<string | null>
   stories$!: Observable<IGetStoriesResponse | null>
 
-  constructor(private readonly store: Store, protected route: ActivatedRoute) {}
+  filters: IFilters = {} as IFilters
+
+  constructor(
+    private readonly store: Store,
+    protected route: ActivatedRoute,
+    private readonly router: Router
+  ) {}
 
   ngOnInit(): void {
     this.initializeValues()
     this.initializeListeners()
-    this.fetchStories()
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const isApiUrlChanged =
+      changes.apiUrlProps.firstChange &&
+      changes.apiUrlProps.currentValue !== changes.apiUrlProps.previousValue
+
+    if (!isApiUrlChanged) {
+      this.fetchStories()
+    }
   }
 
   fetchStories(): void {
-    this.store.dispatch(getStoriesAction({url: this.apiUrlProps}))
+    const parsedUrl = parseUrl(this.apiUrlProps)
+    const stringifiedParams = stringify({
+      ...this.filters,
+      ...parsedUrl.query,
+    })
+
+    const apiUrlWithParams = `${parsedUrl.url}?${stringifiedParams}`
+
+    this.store.dispatch(getStoriesAction({url: apiUrlWithParams}))
   }
 
   initializeValues(): void {
@@ -38,5 +63,10 @@ export class StoriesComponent implements OnInit {
     this.stories$ = this.store.pipe(select(storiesSelector))
   }
 
-  initializeListeners(): void {}
+  initializeListeners(): void {
+    this.route.queryParams.subscribe((params: Params) => {
+      this.filters = params as IFilters
+      this.fetchStories()
+    })
+  }
 }

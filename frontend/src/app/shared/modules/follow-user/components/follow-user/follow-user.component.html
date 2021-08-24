@@ -1,0 +1,15 @@
+<button
+  type="button"
+  *ngIf="!isCurrentUserProfile"
+  [ngClass]="{
+    btn: true,
+    'btn-sm': true,
+    'btn-success': isFollow,
+    'btn-outline-light text-dark': !isFollow,
+    'me-2': true
+  }"
+  (click)="handleFollow()"
+>
+  <i class="bi bi-person"></i>
+  {{ isFollow ? 'Unfollow profile' : 'Follow profile' }}
+</button>

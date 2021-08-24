@@ -1,5 +1,7 @@
+import { currentUserSelector } from 'src/app/auth/store/selectors';
+
 import { Component, Input, OnInit } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 
 import { favoriteStoryAction } from '../../store/actions/favorite-story.action';
 
@@ -12,9 +14,11 @@ export class FavoriteStoryComponent implements OnInit {
   @Input('isFavorite') isFavoriteProps!: boolean
   @Input('favoriteCount') favoriteCountProps!: number
   @Input('storySlug') storySlugProps!: string
+  @Input('storyAuthor') storyAuthorProps!: string
 
   favoriteCount!: number
   isFavorite!: boolean
+  isAuthor!: boolean
 
   constructor(private readonly store: Store) {}
 
@@ -25,6 +29,13 @@ export class FavoriteStoryComponent implements OnInit {
   initializeValues() {
     this.favoriteCount = this.favoriteCountProps
     this.isFavorite = this.isFavoriteProps
+    this.store
+      .pipe(select(currentUserSelector))
+      .subscribe(
+        (currentUser) =>
+          (this.isAuthor = this.storyAuthorProps === currentUser?.username)
+      )
+      .unsubscribe()
   }
 
   handleLike(): void {

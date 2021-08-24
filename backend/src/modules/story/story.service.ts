@@ -141,6 +141,61 @@ export class StoryService {
       .leftJoinAndSelect('story.rating', 'rating')
       .leftJoinAndSelect('story.focus', 'focus')
 
+    if (filterQuery.favorited) {
+      const username = filterQuery.favorited.trim()
+      const user = await this.userRepository.findOne(
+        {username},
+        {relations: ['favoriteStories']}
+      )
+
+      const userFavoritedIds =
+        user.favoriteStories.map((story) => story.id) || []
+
+      if (userFavoritedIds.length > 0) {
+        queryBuilder.andWhere('story.id IN (:...ids)', {
+          ids: userFavoritedIds,
+        })
+      } else {
+        queryBuilder.andWhere('0=1')
+      }
+    }
+
+    if (filterQuery.followed) {
+      const username = filterQuery.followed.trim()
+      const user = await this.userRepository.findOne(
+        {username},
+        {relations: ['followStories']}
+      )
+
+      const userFollowedIds = user.followStories.map((story) => story.id) || []
+
+      if (userFollowedIds.length > 0) {
+        queryBuilder.andWhere('story.id IN (:...ids)', {
+          ids: userFollowedIds,
+        })
+      } else {
+        queryBuilder.andWhere('0=1')
+      }
+    }
+
+    if (filterQuery.author) {
+      const username = filterQuery.author.trim()
+      const user = await this.userRepository.findOne(
+        {username},
+        {relations: ['stories']}
+      )
+
+      const userStoryIds = user.stories.map((story) => story.id) || []
+
+      if (userStoryIds.length > 0) {
+        queryBuilder.andWhere('story.id IN (:...ids)', {
+          ids: userStoryIds,
+        })
+      } else {
+        queryBuilder.andWhere('0=1')
+      }
+    }
+
     if (filterQuery.title) {
       const title = filterQuery.title.trim()
       queryBuilder.andWhere('story.title LIKE :title', {
@@ -157,14 +212,18 @@ export class StoryService {
 
     if (filterQuery.characters) {
       const characters = filterQuery.characters.split(';')
-      queryBuilder.andWhere('story.characters IN (:...characters)', {
-        characters,
-      })
+
+      queryBuilder.andWhere(
+        'story.characters::text[] @> (:characters)::text[]',
+        {
+          characters,
+        }
+      )
     }
 
     if (filterQuery.pairings) {
       const pairings = filterQuery.pairings.split(';')
-      queryBuilder.andWhere('story.pairings IN (:...pairings)', {
+      queryBuilder.andWhere('story.pairings:text[] @> (:pairings)::text[]', {
         pairings,
       })
     }
@@ -261,6 +320,7 @@ export class StoryService {
       currentUser.followStories.push(story)
       story.followCount++
       await this.userRepository.save(currentUser)
+      await this.storyRepository.save(story)
     }
     return story
   }
@@ -291,6 +351,7 @@ export class StoryService {
       currentUser.followStories.splice(idx, 1)
       story.followCount--
       await this.userRepository.save(currentUser)
+      await this.storyRepository.save(story)
     }
 
     return story
@@ -305,6 +366,13 @@ export class StoryService {
 
     if (!story) {
       throw new HttpException("Story doesn't exist", HttpStatus.NOT_FOUND)
+    }
+
+    if (story.author.id === currentUserId) {
+      throw new HttpException(
+        'You cannot favorite yours story',
+        HttpStatus.BAD_REQUEST
+      )
     }
 
     const inFollow = currentUser.favoriteStories
@@ -329,6 +397,13 @@ export class StoryService {
 
     if (!story) {
       throw new HttpException("Story doesn't exist", HttpStatus.NOT_FOUND)
+    }
+
+    if (story.author.id === currentUserId) {
+      throw new HttpException(
+        'You cannot unfavorite yours story',
+        HttpStatus.BAD_REQUEST
+      )
     }
 
     const idx = currentUser.favoriteStories

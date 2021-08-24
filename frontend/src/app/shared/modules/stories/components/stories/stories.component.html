@@ -18,6 +18,7 @@
               [isFavorite]="story.favorite"
               [favoriteCount]="story.favoriteCount"
               [storySlug]="story.slug"
+              [storyAuthor]="story.author.username"
             ></app-favorite-story>
             <app-follow-story
               [isFollow]="story.follow"
@@ -30,14 +31,22 @@
       </h5>
       <p class="info">
         Author:
-        <span class="badge bg-secondary me-1">{{ story.author.username }}</span>
+        <span class="badge bg-secondary me-1"
+          ><a
+            class="badge-link"
+            [routerLink]="['/profiles', story.author.username]"
+            >{{ story.author.username }}</a
+          ></span
+        >
       </p>
       <p class="info">
         Fandoms:
         <span
           class="badge bg-secondary me-1"
           *ngFor="let fandom of story.fandoms"
-          >{{ fandom.title }}</span
+          ><a class="badge-link" [routerLink]="['/stories', fandom.slug]">{{
+            fandom.title
+          }}</a></span
         >
       </p>
       <p class="info">
@@ -59,7 +68,7 @@
       <p class="info">
         Tags:
         <span class="badge bg-secondary me-1" *ngFor="let tag of story.tags">{{
-          tag.title
+          tag.title | titlecase
         }}</span>
       </p>
       <p class="info">

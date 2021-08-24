@@ -13,8 +13,10 @@ import { AllStoriesModule } from './all-stories/all-stories.module';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthModule } from './auth/auth.module';
+import { FandomsModule } from './shared/modules/fandoms/fandoms.module';
 import { TopNavigationModule } from './shared/modules/top-navigation/top-navigation.module';
 import { AuthInterceptor } from './shared/services/auth.interceptor';
+import { UserProfileModule } from './user-profile/user-profile.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -24,6 +26,8 @@ import { AuthInterceptor } from './shared/services/auth.interceptor';
     AuthModule,
     AllStoriesModule,
     TopNavigationModule,
+    UserProfileModule,
+    FandomsModule,
     StoreModule.forRoot([]),
     EffectsModule.forRoot([]),
     StoreRouterConnectingModule.forRoot(),

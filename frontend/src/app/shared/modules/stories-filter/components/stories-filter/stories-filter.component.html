@@ -1,0 +1,56 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="mb-3">
+    <label for="title" class="form-label">Title</label>
+    <input
+      formControlName="title"
+      type="text"
+      class="form-control"
+      id="title"
+    />
+  </div>
+  <div class="mb-3">
+    <label for="words" class="form-label">Words</label>
+    <input
+      formControlName="words"
+      type="number"
+      class="form-control"
+      id="words"
+    />
+  </div>
+  <div class="mb-3">
+    <select
+      class="form-select"
+      multiple
+      aria-label="multiple select"
+      formControlName="fandoms"
+      (change)="onFandomSelect()"
+    >
+      <option
+        *ngFor="let fandom of (fandoms$ | async)?.fandoms"
+        [value]="fandom"
+      >
+        {{ fandom.title }}
+      </option>
+    </select>
+  </div>
+  <div class="mb-3">
+    <select
+      class="form-select"
+      multiple
+      aria-label="multiple select"
+      formControlName="characters"
+    >
+      <option *ngFor="let character of characters" [ngValue]="character.name">
+        {{ character.name }}
+      </option>
+    </select>
+  </div>
+  <button type="submit" class="me-2 btn btn-sm btn-secondary">Filter</button>
+  <button
+    type="submit"
+    class="btn btn-sm btn-outline-secondary"
+    (click)="onReset()"
+  >
+    Reset filter
+  </button>
+</form>

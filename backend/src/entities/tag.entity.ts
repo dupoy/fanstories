@@ -1,25 +1,19 @@
-import {
-  BeforeInsert,
-  BeforeUpdate,
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('tags')
 export class TagEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column()
-  title: string;
+  title: string
 
-  @Column({ default: '' })
-  description: string;
+  @Column({default: ''})
+  description: string
 
   @BeforeInsert()
   @BeforeUpdate()
   normalizeTitle() {
-    this.title = this.title.toLowerCase().trim();
+    this.title = this.title.trim()
   }
 }

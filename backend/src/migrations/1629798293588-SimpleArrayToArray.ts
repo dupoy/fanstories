@@ -1,7 +1,7 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class All1628795430879 implements MigrationInterface {
-    name = 'All1628795430879'
+export class SimpleArrayToArray1629798293588 implements MigrationInterface {
+    name = 'SimpleArrayToArray1629798293588'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "characters" ("id" SERIAL NOT NULL, "name" character varying NOT NULL, "fandomId" integer, CONSTRAINT "PK_9d731e05758f26b9315dac5e378" PRIMARY KEY ("id"))`);
@@ -11,8 +11,8 @@ export class All1628795430879 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "tags" ("id" SERIAL NOT NULL, "title" character varying NOT NULL, "description" character varying NOT NULL DEFAULT '', CONSTRAINT "PK_e7dc17249a1148a1970748eda99" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "users" ("id" SERIAL NOT NULL, "username" character varying NOT NULL, "email" character varying NOT NULL, "password" character varying NOT NULL, "bio" character varying NOT NULL DEFAULT '', "image" character varying NOT NULL, CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TYPE "stories_status_enum" AS ENUM('In progress', 'Completed', 'Abandoned')`);
-        await queryRunner.query(`CREATE TABLE "stories" ("id" SERIAL NOT NULL, "slug" character varying NOT NULL, "title" character varying NOT NULL, "description" character varying NOT NULL, "words" integer NOT NULL DEFAULT '0', "status" "stories_status_enum" NOT NULL DEFAULT 'In progress', "favoriteCount" integer NOT NULL DEFAULT '0', "followCount" integer NOT NULL DEFAULT '0', "isPublished" boolean NOT NULL DEFAULT false, "characters" text NOT NULL, "pairings" text NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "ratingId" integer, "focusId" integer, "authorId" integer, CONSTRAINT "PK_bb6f880b260ed96c452b32a39f0" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "chapters" ("id" SERIAL NOT NULL, "slug" character varying NOT NULL, "title" character varying NOT NULL, "body" character varying NOT NULL, "words" integer NOT NULL DEFAULT '0', "isPublished" boolean NOT NULL DEFAULT false, "storyId" integer, CONSTRAINT "PK_a2bbdbb4bdc786fe0cb0fcfc4a0" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "stories" ("id" SERIAL NOT NULL, "slug" character varying NOT NULL, "title" character varying NOT NULL, "description" character varying NOT NULL, "words" integer NOT NULL DEFAULT '0', "pages" integer NOT NULL DEFAULT '0', "status" "stories_status_enum" NOT NULL DEFAULT 'In progress', "favoriteCount" integer NOT NULL DEFAULT '0', "followCount" integer NOT NULL DEFAULT '0', "viewCount" integer NOT NULL DEFAULT '0', "isPublished" boolean NOT NULL DEFAULT false, "characters" text array NOT NULL, "pairings" text array NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "ratingId" integer, "focusId" integer, "authorId" integer, CONSTRAINT "PK_bb6f880b260ed96c452b32a39f0" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "chapters" ("id" SERIAL NOT NULL, "slug" character varying NOT NULL, "title" character varying NOT NULL, "body" character varying NOT NULL, "words" integer NOT NULL DEFAULT '0', "viewCount" integer NOT NULL DEFAULT '0', "isPublished" boolean NOT NULL DEFAULT false, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "storyId" integer, CONSTRAINT "PK_a2bbdbb4bdc786fe0cb0fcfc4a0" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "users_follow_authors_users" ("usersId_1" integer NOT NULL, "usersId_2" integer NOT NULL, CONSTRAINT "PK_8323fbfb2b574b683371fc553e5" PRIMARY KEY ("usersId_1", "usersId_2"))`);
         await queryRunner.query(`CREATE INDEX "IDX_5de6ce1c4b87ab58d991e538ae" ON "users_follow_authors_users" ("usersId_1") `);
         await queryRunner.query(`CREATE INDEX "IDX_4af1c6afbfd100fe60a2f3c101" ON "users_follow_authors_users" ("usersId_2") `);

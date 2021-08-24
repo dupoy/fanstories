@@ -1,3 +1,6 @@
-<div class="container page">
-  <div class="row"><app-stories [apiUrl]="apiUrl"></app-stories></div>
+<div class="container">
+  <app-stories-filter (onSubmitEvent)="onSubmit($event)"></app-stories-filter>
+  <div class="row mt-5">
+    <app-stories [apiUrl]="apiUrl"></app-stories>
+  </div>
 </div>
