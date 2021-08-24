@@ -3,4 +3,5 @@ export interface IFilters {
   words: number
   fandoms: string
   characters: string
+  pairings: string
 }

@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
 
 import { ICharacter } from '../../../../types/character-interface';
@@ -22,6 +22,10 @@ export class StoriesFilterComponent implements OnInit {
 
   fandoms$!: Observable<IGetFandomResponse | null>
   characters: ICharacter[] = []
+
+  get pairings() {
+    return (this.form.get('pairings') as FormArray).controls
+  }
 
   constructor(private readonly store: Store) {}
 
@@ -45,6 +49,7 @@ export class StoriesFilterComponent implements OnInit {
       words: new FormControl(0),
       fandoms: new FormControl(null),
       characters: new FormControl(null),
+      pairings: new FormArray([]),
     })
   }
 
@@ -55,7 +60,11 @@ export class StoriesFilterComponent implements OnInit {
       fandoms: this.form.value['fandoms']
         ?.map((fandom: IFandom) => fandom.title)
         .join(';'),
-      characters: this.form.value['characters']?.join(','),
+      characters: this.form.value['characters']?.join(';'),
+      pairings: this.form.value['pairings']
+        ?.map((pairing: string[]) => pairing.join('/'))
+        ?.map((pairing: string) => `[${pairing}]`)
+        ?.join(';'),
     }
 
     console.log(filters)
@@ -74,5 +83,10 @@ export class StoriesFilterComponent implements OnInit {
     this.form.value['fandoms']?.map((fandom: IFandom) =>
       this.characters.push(...fandom.characters)
     )
+  }
+
+  addPairing() {
+    const control = new FormControl(null, Validators.required)
+    ;(this.form.get('pairings') as FormArray).push(control)
   }
 }

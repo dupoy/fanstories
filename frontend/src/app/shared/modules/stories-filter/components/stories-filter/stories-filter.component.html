@@ -18,7 +18,9 @@
     />
   </div>
   <div class="mb-3">
+    <label for="fandoms" class="form-label">Fandoms</label>
     <select
+      id="fandoms"
       class="form-select"
       multiple
       aria-label="multiple select"
@@ -34,7 +36,9 @@
     </select>
   </div>
   <div class="mb-3">
+    <label for="characters" class="form-label">Characters</label>
     <select
+      id="characters"
       class="form-select"
       multiple
       aria-label="multiple select"
@@ -44,6 +48,28 @@
         {{ character.name }}
       </option>
     </select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Add pairings</label>
+    <a class="btn btn-link"
+      ><i class="bi bi-plus-lg text-success" (click)="addPairing()"></i
+    ></a>
+    <div
+      class="mb-3"
+      formGroupName="pairings"
+      *ngFor="let control of pairings; let idx = index"
+    >
+      <select
+        class="form-select"
+        multiple
+        aria-label="multiple select"
+        [formControlName]="idx"
+      >
+        <option *ngFor="let character of characters" [ngValue]="character.name">
+          {{ character.name }}
+        </option>
+      </select>
+    </div>
   </div>
   <button type="submit" class="me-2 btn btn-sm btn-secondary">Filter</button>
   <button

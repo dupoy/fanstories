@@ -223,26 +223,31 @@ export class StoryService {
 
     if (filterQuery.pairings) {
       const pairings = filterQuery.pairings.split(';')
-      queryBuilder.andWhere('story.pairings:text[] @> (:pairings)::text[]', {
+      queryBuilder.andWhere('story.pairings::text[] @> (:pairings)::text[]', {
         pairings,
       })
     }
 
     if (filterQuery.rating) {
-      const rating = await this.utilsService.findOneByValueRating(
-        filterQuery.rating
+      const ratings = filterQuery.rating.split(';')
+
+      const ratingIds = await Promise.all(
+        ratings.map((rating) => this.utilsService.findOneByValueRating(rating))
       )
-      queryBuilder.andWhere('rating.id = :id', {
-        id: rating.id,
+
+      queryBuilder.andWhere('rating.id IN (:...ids)', {
+        ids: ratingIds,
       })
     }
 
     if (filterQuery.focus) {
-      const focus = await this.utilsService.findOneByValueFocus(
-        filterQuery.focus
+      const focuses = filterQuery.focus.split(';')
+
+      const focusIds = await Promise.all(
+        focuses.map((focus) => this.utilsService.findOneByValueFocus(focus))
       )
-      queryBuilder.andWhere('focus.id = :id', {
-        id: focus.id,
+      queryBuilder.andWhere('focus.id IN (:...ids)', {
+        ids: focusIds,
       })
     }
 
