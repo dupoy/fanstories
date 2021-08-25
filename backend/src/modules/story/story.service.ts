@@ -25,7 +25,7 @@ export class StoryService {
     private readonly userRepository: Repository<UserEntity>,
     private readonly userService: UserService,
     private readonly tagService: TagService,
-    private readonly famdomService: FandomService,
+    private readonly fandomService: FandomService,
     private readonly profileService: ProfileService,
     private readonly utilsService: UtilsService
   ) {}
@@ -55,21 +55,23 @@ export class StoryService {
     )
 
     const tags = await this.tagService.find(createStoryDto.tags || [])
+
     const fandoms = (
-      await this.famdomService.find({
+      await this.fandomService.find({
         titles: createStoryDto.fandoms || [],
       })
     ).fandoms.map((fandom) => {
       delete fandom.characters
       return fandom
     })
+
     const betas = await this.userService.find(createStoryDto.betas || [])
 
     const story = Object.assign(new StoryEntity(), {
       ...createStoryDto,
       fandoms,
-      tags,
       betas,
+      tags,
       focus,
       rating,
       author: currentUser,
@@ -110,7 +112,7 @@ export class StoryService {
 
     const tags = await this.tagService.find(updateStoryDto.tags)
     const fandoms = (
-      await this.famdomService.find({
+      await this.fandomService.find({
         titles: updateStoryDto.fandoms,
       })
     ).fandoms.map((fandom) => {
@@ -135,8 +137,6 @@ export class StoryService {
   ): Promise<IStoriesResponse> {
     const queryBuilder = this.storyRepository
       .createQueryBuilder('story')
-      .leftJoinAndSelect('story.tags', 'tags')
-      .leftJoinAndSelect('story.fandoms', 'fandoms')
       .leftJoinAndSelect('story.author', 'author')
       .leftJoinAndSelect('story.rating', 'rating')
       .leftJoinAndSelect('story.focus', 'focus')
@@ -224,9 +224,12 @@ export class StoryService {
     if (filterQuery.excludeCharacters) {
       const characters = filterQuery.excludeCharacters.split(';')
 
-      queryBuilder.andWhere('story.characters NOT IN (:characters)', {
-        characters,
-      })
+      queryBuilder.andWhere(
+        'NOT(story.characters::text[] && (:characters)::text[])',
+        {
+          characters,
+        }
+      )
     }
 
     if (filterQuery.pairings) {
@@ -239,7 +242,7 @@ export class StoryService {
     if (filterQuery.excludePairings) {
       const pairings = filterQuery.excludePairings.split(';')
 
-      queryBuilder.andWhere('story.pairings NOT IN (:pairings)', {
+      queryBuilder.andWhere('NOT(story.pairings && (:pairings))', {
         pairings,
       })
     }
@@ -268,48 +271,57 @@ export class StoryService {
     }
 
     if (filterQuery.fandoms) {
-      const fandomIds = (
-        await this.famdomService.find({
-          titles: filterQuery.fandoms.split(';'),
+      const fandoms = JSON.stringify(
+        (
+          await this.fandomService.find({
+            titles: filterQuery.fandoms.split(';'),
+          })
+        ).fandoms.map((fandom) => {
+          delete fandom.characters
+          return fandom
         })
-      ).fandoms.map((fandom) => fandom.id)
-      if (fandomIds.length > 0)
-        queryBuilder.andWhere('fandoms.id IN (:...fandoms)', {
-          fandoms: fandomIds,
-        })
+      )
+
+      queryBuilder.andWhere('story.fandoms::jsonb @> :fandoms::jsonb', {
+        fandoms,
+      })
     }
 
     if (filterQuery.excludeFandoms) {
-      const fandomIds = (
-        await this.famdomService.find({
-          titles: filterQuery.excludeFandoms.split(';'),
+      const fandoms = JSON.stringify(
+        (
+          await this.fandomService.find({
+            titles: filterQuery.excludeFandoms.split(';'),
+          })
+        ).fandoms.map((fandom) => {
+          delete fandom.characters
+          return fandom
         })
-      ).fandoms.map((fandom) => fandom.id)
+      )
 
-      if (fandomIds.length > 0)
-        queryBuilder.andWhere('fandoms.id NOT IN (:...fandoms)', {
-          fandoms: fandomIds,
-        })
+      queryBuilder.andWhere('NOT(story.fandoms::jsonb @> :fandoms::jsonb)', {
+        fandoms,
+      })
     }
 
     if (filterQuery.tags) {
-      const tagIds = (
+      const tags = JSON.stringify(
         await this.tagService.find(filterQuery.tags.split(';'))
-      ).map((tag) => tag.id)
-      if (tagIds.length > 0)
-        queryBuilder.andWhere('tags.id IN (:...tags)', {
-          tags: tagIds,
-        })
+      )
+
+      queryBuilder.andWhere('story.tags::jsonb @> :tags::jsonb', {
+        tags,
+      })
     }
 
     if (filterQuery.excludeTags) {
-      const tagIds = (
+      const tags = JSON.stringify(
         await this.tagService.find(filterQuery.excludeTags.split(';'))
-      ).map((tag) => tag.id)
-      if (tagIds.length > 0)
-        queryBuilder.andWhere('tags.id NOT IN (:...tags)', {
-          tags: tagIds,
-        })
+      )
+
+      queryBuilder.andWhere('NOT(story.tags::jsonb @> :tags::jsonb)', {
+        tags,
+      })
     }
 
     if (filterQuery.order && filterQuery.sort) {

@@ -13,6 +13,6 @@ const config: ConnectionOptions = {
   cli: {
     migrationsDir: 'src/migrations',
   },
-};
+}
 
-export default config;
+export default config

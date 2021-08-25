@@ -34,7 +34,34 @@
         {{ fandom.title }}
       </option>
     </select>
+    <div class="mb-3 form-check">
+      <input
+        type="checkbox"
+        class="form-check-input"
+        [(ngModel)]="showExcludeFandoms"
+        [ngModelOptions]="{standalone: true}"
+      />
+      Exclude fandoms?
+    </div>
   </div>
+  <div class="mb-3" *ngIf="showExcludeFandoms">
+    <label for="fandoms" class="form-label">Exclude fandoms</label>
+    <select
+      id="fandoms"
+      class="form-select"
+      multiple
+      aria-label="multiple select"
+      formControlName="excludeFandoms"
+    >
+      <option
+        *ngFor="let fandom of (fandoms$ | async)?.fandoms"
+        [value]="fandom"
+      >
+        {{ fandom.title }}
+      </option>
+    </select>
+  </div>
+
   <div class="mb-3">
     <label for="characters" class="form-label">Characters</label>
     <select
@@ -48,16 +75,66 @@
         {{ character.name }}
       </option>
     </select>
+    <div class="mb-3 form-check">
+      <input
+        type="checkbox"
+        class="form-check-input"
+        [(ngModel)]="showExcludeCharacters"
+        [ngModelOptions]="{standalone: true}"
+      />
+      Exclude characters?
+    </div>
   </div>
+
+  <div class="mb-3" *ngIf="showExcludeCharacters">
+    <label for="fandoms" class="form-label">Exclude characters</label>
+    <select
+      id="fandoms"
+      class="form-select"
+      multiple
+      aria-label="multiple select"
+      formControlName="excludeCharacters"
+    >
+      <option *ngFor="let character of characters" [ngValue]="character.name">
+        {{ character.name }}
+      </option>
+    </select>
+  </div>
+
   <div class="mb-3">
     <label class="form-label">Add pairings</label>
     <a class="btn btn-link"
       ><i class="bi bi-plus-lg text-success" (click)="addPairing()"></i
     ></a>
+
     <div
       class="mb-3"
       formGroupName="pairings"
       *ngFor="let control of pairings; let idx = index"
+    >
+      <select
+        class="form-select"
+        multiple
+        aria-label="multiple select"
+        [formControlName]="idx"
+      >
+        <option *ngFor="let character of characters" [ngValue]="character.name">
+          {{ character.name }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Exclude pairings</label>
+    <a class="btn btn-link"
+      ><i class="bi bi-plus-lg text-success" (click)="excludePairing()"></i
+    ></a>
+
+    <div
+      class="mb-3"
+      formGroupName="excludePairings"
+      *ngFor="let control of excludePairings; let idx = index"
     >
       <select
         class="form-select"
@@ -84,7 +161,32 @@
         {{ tag.title }}
       </option>
     </select>
+    <div class="mb-3 form-check">
+      <input
+        type="checkbox"
+        class="form-check-input"
+        [(ngModel)]="showExcludeTags"
+        [ngModelOptions]="{standalone: true}"
+      />
+      Exclude tags?
+    </div>
   </div>
+
+  <div class="mb-3" *ngIf="showExcludeTags">
+    <label for="fandoms" class="form-label">Exclude tags</label>
+    <select
+      id="fandoms"
+      class="form-select"
+      multiple
+      aria-label="multiple select"
+      formControlName="excludeTags"
+    >
+      <option *ngFor="let tag of (tags$ | async)?.tags" [ngValue]="tag.title">
+        {{ tag.title }}
+      </option>
+    </select>
+  </div>
+
   <button type="submit" class="me-2 btn btn-sm btn-secondary">Filter</button>
   <button
     type="submit"

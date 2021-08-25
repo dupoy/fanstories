@@ -28,8 +28,16 @@ export class StoriesFilterComponent implements OnInit {
 
   characters: ICharacter[] = []
 
+  showExcludeFandoms: boolean = false
+  showExcludeCharacters: boolean = false
+  showExcludeTags: boolean = false
+
   get pairings() {
     return (this.form.get('pairings') as FormArray).controls
+  }
+
+  get excludePairings() {
+    return (this.form.get('excludePairings') as FormArray).controls
   }
 
   constructor(private readonly store: Store) {}
@@ -58,6 +66,10 @@ export class StoriesFilterComponent implements OnInit {
       characters: new FormControl(null),
       pairings: new FormArray([]),
       tags: new FormControl(null),
+      excludeFandoms: new FormControl(null),
+      excludeCharacters: new FormControl(null),
+      excludePairings: new FormArray([]),
+      excludeTags: new FormControl(null),
     })
   }
 
@@ -74,6 +86,21 @@ export class StoriesFilterComponent implements OnInit {
         ?.map((pairing: string) => `[${pairing}]`)
         ?.join(';'),
       tags: this.form.value['tags']?.join(';'),
+      excludeFandoms: this.showExcludeFandoms
+        ? this.form.value['excludeFandoms']
+            ?.map((fandom: IFandom) => fandom.title)
+            .join(';')
+        : null,
+      excludeCharacters: this.showExcludeCharacters
+        ? this.form.value['excludeCharacters']?.join(';')
+        : null,
+      excludePairings: this.form.value['excludePairings']
+        ?.map((pairing: string[]) => pairing.join('/'))
+        ?.map((pairing: string) => `[${pairing}]`)
+        ?.join(';'),
+      excludeTags: this.showExcludeTags
+        ? this.form.value['excludeTags']?.join(';')
+        : null,
     }
 
     console.log(filters)
@@ -85,6 +112,13 @@ export class StoriesFilterComponent implements OnInit {
     this.form.reset()
     this.characters = []
     this.onSubmitEvent.emit(this.form.value)
+    ;(this.form.get('pairings') as FormArray).controls = []
+    ;(this.form.get('excludePairings') as FormArray).controls = []
+
+    this.showExcludeCharacters =
+      this.showExcludeFandoms =
+      this.showExcludeTags =
+        false
   }
 
   onFandomSelect() {
@@ -97,5 +131,10 @@ export class StoriesFilterComponent implements OnInit {
   addPairing() {
     const control = new FormControl(null, Validators.required)
     ;(this.form.get('pairings') as FormArray).push(control)
+  }
+
+  excludePairing() {
+    const control = new FormControl(null, Validators.required)
+    ;(this.form.get('excludePairings') as FormArray).push(control)
   }
 }

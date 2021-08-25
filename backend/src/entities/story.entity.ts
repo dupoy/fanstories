@@ -6,10 +6,8 @@ import {
 
 import { StoryStatuses } from '../types/storyStatus.enum';
 import { ChapterEntity } from './chapter.entity';
-import { FandomEntity } from './fandom.entity';
 import { FocusEntity } from './focus.entity';
 import { RatingEntity } from './rating.entity';
-import { TagEntity } from './tag.entity';
 import { UserEntity } from './user.entity';
 
 @Entity('stories')
@@ -66,9 +64,8 @@ export class StoryEntity {
   })
   chapters: ChapterEntity[]
 
-  @ManyToMany(() => FandomEntity)
-  @JoinTable()
-  fandoms: FandomEntity[]
+  @Column('jsonb', {array: false})
+  fandoms: [{}]
 
   @Column('text', {array: true})
   characters: string[]
@@ -76,9 +73,8 @@ export class StoryEntity {
   @Column('text', {array: true})
   pairings: string[]
 
-  @ManyToMany(() => TagEntity, {eager: true})
-  @JoinTable()
-  tags: TagEntity[]
+  @Column('jsonb', {array: false})
+  tags: [{}]
 
   @ManyToMany(() => UserEntity)
   @JoinTable()
