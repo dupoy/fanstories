@@ -33,11 +33,11 @@ export class StoriesFilterComponent implements OnInit {
   showExcludeTags: boolean = false
 
   get pairings() {
-    return (this.form.get('pairings') as FormArray).controls
+    return (this.form.get('pairings') as FormArray)?.controls
   }
 
   get excludePairings() {
-    return (this.form.get('excludePairings') as FormArray).controls
+    return (this.form.get('excludePairings') as FormArray)?.controls
   }
 
   constructor(private readonly store: Store) {}
@@ -64,11 +64,9 @@ export class StoriesFilterComponent implements OnInit {
       words: new FormControl(0),
       fandoms: new FormControl(null),
       characters: new FormControl(null),
-      pairings: new FormArray([]),
       tags: new FormControl(null),
       excludeFandoms: new FormControl(null),
       excludeCharacters: new FormControl(null),
-      excludePairings: new FormArray([]),
       excludeTags: new FormControl(null),
     })
   }
@@ -82,8 +80,7 @@ export class StoriesFilterComponent implements OnInit {
         .join(';'),
       characters: this.form.value['characters']?.join(';'),
       pairings: this.form.value['pairings']
-        ?.map((pairing: string[]) => pairing.join('/'))
-        ?.map((pairing: string) => `[${pairing}]`)
+        ?.map((pairing: string[]) => `[${pairing.join('/')}]`)
         ?.join(';'),
       tags: this.form.value['tags']?.join(';'),
       excludeFandoms: this.showExcludeFandoms
@@ -95,15 +92,12 @@ export class StoriesFilterComponent implements OnInit {
         ? this.form.value['excludeCharacters']?.join(';')
         : null,
       excludePairings: this.form.value['excludePairings']
-        ?.map((pairing: string[]) => pairing.join('/'))
-        ?.map((pairing: string) => `[${pairing}]`)
+        ?.map((pairing: string[]) => `[${pairing.join('/')}]`)
         ?.join(';'),
       excludeTags: this.showExcludeTags
         ? this.form.value['excludeTags']?.join(';')
         : null,
     }
-
-    console.log(filters)
 
     this.onSubmitEvent.emit(filters)
   }
@@ -112,8 +106,14 @@ export class StoriesFilterComponent implements OnInit {
     this.form.reset()
     this.characters = []
     this.onSubmitEvent.emit(this.form.value)
-    ;(this.form.get('pairings') as FormArray).controls = []
-    ;(this.form.get('excludePairings') as FormArray).controls = []
+
+    if (this.form.get('pairings')) {
+      this.form.removeControl('pairings')
+    }
+
+    if (this.form.get('excludePairings')) {
+      this.form.removeControl('excludePairings')
+    }
 
     this.showExcludeCharacters =
       this.showExcludeFandoms =
@@ -130,11 +130,25 @@ export class StoriesFilterComponent implements OnInit {
 
   addPairing() {
     const control = new FormControl(null, Validators.required)
-    ;(this.form.get('pairings') as FormArray).push(control)
+
+    if (this.form.get('pairings')) {
+      ;(this.form.get('pairings') as FormArray).push(control)
+    } else {
+      const pairingsArray = new FormArray([])
+      this.form.addControl('pairings', pairingsArray)
+      ;(this.form.get('pairings') as FormArray).push(control)
+    }
   }
 
   excludePairing() {
     const control = new FormControl(null, Validators.required)
-    ;(this.form.get('excludePairings') as FormArray).push(control)
+
+    if (this.form.get('excludePairings')) {
+      ;(this.form.get('excludePairings') as FormArray).push(control)
+    } else {
+      const pairingsArray = new FormArray([])
+      this.form.addControl('excludePairings', pairingsArray)
+      ;(this.form.get('excludePairings') as FormArray).push(control)
+    }
   }
 }
