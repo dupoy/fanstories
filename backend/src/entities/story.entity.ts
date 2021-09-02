@@ -59,7 +59,7 @@ export class StoryEntity {
   author: UserEntity
 
   @OneToMany(() => ChapterEntity, (chapter) => chapter.story, {
-    onDelete: 'CASCADE',
+    cascade: true,
     eager: true,
   })
   chapters: ChapterEntity[]

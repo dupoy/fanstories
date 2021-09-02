@@ -4,15 +4,17 @@ import { PersistenceService } from 'src/app/shared/services/persistence.service'
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { Store } from '@ngrx/store';
 
 import { logoutAction } from '../action/sync.action';
 
 @Injectable()
 export class LogoutEffect {
   constructor(
-    private actions$: Actions,
-    private persistenseService: PersistenceService,
-    private router: Router
+    private readonly actions$: Actions,
+    private readonly persistenseService: PersistenceService,
+    private readonly router: Router,
+    private readonly store: Store
   ) {}
 
   logout$ = createEffect(
@@ -21,7 +23,7 @@ export class LogoutEffect {
         ofType(logoutAction),
         tap(() => {
           this.persistenseService.set('accessToken', '')
-          this.router.navigateByUrl('/')
+          this.router.navigate(['/login'])
         })
       ),
     {dispatch: false}

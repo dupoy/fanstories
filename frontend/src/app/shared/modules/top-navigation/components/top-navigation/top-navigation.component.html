@@ -23,20 +23,31 @@
           *ngIf="(isLoggedIn$ | async) && (currentUser$ | async) as currentUser"
         >
           <li class="nav-item">
-            <a routerLink="" class="nav-link"> <i class="bi bi-pencil"></i></a>
+            <a [routerLink]="['/stories', 'create']" class="nav-link">
+              <i class="bi bi-pencil"></i
+            ></a>
           </li>
           <li>
-            <a routerLink="" class="nav-link">
+            <a
+              class="nav-link"
+              [routerLink]="['profiles', currentUser.username]"
+            >
               <i class="bi bi-layout-text-sidebar"></i>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="">
+            <a
+              class="nav-link"
+              [routerLink]="['profiles', currentUser.username, 'followes']"
+            >
               <i class="bi bi-bell"></i>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="">
+            <a
+              class="nav-link"
+              [routerLink]="['profiles', currentUser.username, 'favorites']"
+            >
               <i class="bi bi-bookmark"></i>
             </a>
           </li>

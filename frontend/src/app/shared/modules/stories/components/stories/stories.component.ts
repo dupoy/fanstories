@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { IFilters } from 'src/app/shared/types/filters.interface';
 
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 
 import { getStoriesAction } from '../../store/actions/get-stories.action';
@@ -24,11 +24,7 @@ export class StoriesComponent implements OnInit, OnChanges {
 
   filters: IFilters = {} as IFilters
 
-  constructor(
-    private readonly store: Store,
-    protected route: ActivatedRoute,
-    private readonly router: Router
-  ) {}
+  constructor(private readonly store: Store, protected route: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.initializeValues()

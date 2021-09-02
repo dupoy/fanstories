@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 
 import { AuthGuard } from '../user/guards/auth.guard';
 import { CreateFucusOrRatingDto } from './dto/ceateFocusOrRating.dto';
@@ -13,16 +13,26 @@ export class UtilsController {
   @Post('ratings')
   @UseGuards(AuthGuard)
   async createRatings(
-    @Body('ratings') createRatingDtos: CreateFucusOrRatingDto[],
+    @Body('ratings') createRatingDtos: CreateFucusOrRatingDto[]
   ): Promise<IRatingsResponse> {
-    return this.utilsService.createRatings(createRatingDtos);
+    return this.utilsService.createRatings(createRatingDtos)
   }
 
   @Post('focuses')
   @UseGuards(AuthGuard)
   async createFocuses(
-    @Body('focuses') createFocusDtos: CreateFucusOrRatingDto[],
+    @Body('focuses') createFocusDtos: CreateFucusOrRatingDto[]
   ): Promise<IFocusesResponse> {
-    return this.utilsService.createFocuses(createFocusDtos);
+    return this.utilsService.createFocuses(createFocusDtos)
+  }
+
+  @Get('focuses')
+  async getFocuses(): Promise<IFocusesResponse> {
+    return this.utilsService.findFocus()
+  }
+
+  @Get('ratings')
+  async getRatings(): Promise<IRatingsResponse> {
+    return this.utilsService.findRating()
   }
 }

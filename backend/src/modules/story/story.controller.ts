@@ -1,3 +1,5 @@
+import { DeleteResult } from 'typeorm';
+
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 
 import { User } from '../user/decorators/user.decorator';
@@ -105,5 +107,14 @@ export class StoryController {
       await this.storyService.unfavoriteStory(slug, currentUserId),
       currentUserId
     )
+  }
+
+  @Delete('/:slug')
+  @UseGuards(AuthGuard)
+  async deleteStory(
+    @Param('slug') slug: string,
+    @User('id') currentUserId: number
+  ): Promise<DeleteResult> {
+    return this.storyService.findOneBySlugAndDelete(slug, currentUserId)
   }
 }

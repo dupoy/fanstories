@@ -1,3 +1,4 @@
+import { StoryStatusType } from '../../story/types/story-status.type';
 import { IChapter } from './chapter.interface';
 import { IFandom } from './fandom.interface';
 import { IFocus } from './focus.interface';
@@ -12,7 +13,7 @@ export interface IStory {
   description: string
   words: number
   pages: number
-  status: string
+  status: StoryStatusType
   favoriteCount: number
   followCount: number
   viewCount: number

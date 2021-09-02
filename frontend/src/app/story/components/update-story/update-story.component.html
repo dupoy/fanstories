@@ -1,0 +1,190 @@
+<div class="container mt-5">
+  <h1>Update story</h1>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="needs-validation">
+    <div class="mb-3">
+      <label for="title" class="form-label">Title</label>
+      <input
+        type="text"
+        class="form-control"
+        id="title"
+        [ngClass]="{'is-valid': titleControl?.valid && titleControl?.touched}"
+        [ngClass]="{
+          'is-invalid': descriptionControl?.invalid && titleControl?.touched
+        }"
+        formControlName="title"
+      />
+      <div class="invalid-feedback">
+        <span *ngIf="titleControl?.errors?.required"
+          >Title field is required</span
+        >
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea
+        class="form-control"
+        id="description"
+        rows="4"
+        formControlName="description"
+        [ngClass]="{
+          'is-valid': descriptionControl?.valid && descriptionControl?.touched
+        }"
+        [ngClass]="{
+          'is-invalid':
+            descriptionControl?.invalid && descriptionControl?.touched
+        }"
+      ></textarea>
+
+      <div class="invalid-feedback">
+        <span *ngIf="descriptionControl?.errors?.maxlength"
+          >Description must be no more than
+          {{ descriptionControl?.errors?.maxlength.requiredLength }}, current:
+          {{ descriptionControl?.errors?.maxlength.actualLength }}
+        </span>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="status" class="form-label">Status</label>
+      <select
+        class="form-control"
+        id="status"
+        formControlName="status"
+        [ngClass]="{
+          'is-valid': statusControl?.valid && statusControl?.touched
+        }"
+        [ngClass]="{
+          'is-invalid': statusControl?.invalid && statusControl?.touched
+        }"
+      >
+        <option value="In progress">In progress</option>
+        <option value="Completed">Completed</option>
+        <option value="Abandoned">Abandoned</option>
+      </select>
+
+      <div class="invalid-feedback">
+        <span *ngIf="statusControl?.errors?.required"
+          >Status field is required
+        </span>
+      </div>
+    </div>
+
+    <div class="mb-3" *ngIf="(fandoms$ | async)?.fandoms as fandoms">
+      <label for="fandoms" class="form-label">Fandoms</label>
+      <ng-multiselect-dropdown
+        [placeholder]="'Select fandoms'"
+        [settings]="dropdownSelectFandomsOrTags"
+        [(ngModel)]="selectedFandoms"
+        (ngModelChange)="onFandomSelect($event)"
+        [data]="fandoms"
+        formControlName="fandoms"
+        [ngClass]="{
+          'is-invalid': fandomsControl?.invalid && fandomsControl?.touched
+        }"
+      ></ng-multiselect-dropdown>
+      <div class="invalid-feedback">
+        <span *ngIf="fandomsControl?.errors?.required"
+          >Fandoms is required</span
+        >
+      </div>
+    </div>
+
+    <ng-container *ngIf="characters?.length || selectedCharacters">
+      <div class="mb-3">
+        <label for="characters" class="form-label">Characters</label>
+        <ng-multiselect-dropdown
+          [placeholder]="'Select characters'"
+          [settings]="dropdownSelectCharacters"
+          [(ngModel)]="selectedCharacters"
+          [data]="characters"
+          formControlName="characters"
+          [ngClass]="{
+            'is-invalid':
+              charactersControl?.invalid && charactersControl?.touched
+          }"
+        ></ng-multiselect-dropdown>
+        <div class="invalid-feedback">
+          <span *ngIf="charactersControl?.errors?.required"
+            >Characters is required</span
+          >
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Add pairings</label>
+        <a class="btn btn-link"
+          ><i class="bi bi-plus-lg text-success" (click)="addPairing()"></i
+        ></a>
+
+        <div
+          class="mb-3"
+          formGroupName="pairings"
+          *ngFor="let control of pairingsControl; let idx = index"
+        >
+          <ng-multiselect-dropdown
+            [formControlName]="idx"
+            [settings]="dropdownSelectCharacters"
+            [(ngModel)]="selectedPairings[idx]"
+            [placeholder]="'Select pairing'"
+            [data]="characters"
+          >
+          </ng-multiselect-dropdown>
+        </div>
+      </div>
+    </ng-container>
+
+    <div class="mb-3" *ngIf="(tags$ | async)?.tags as tags">
+      <label for="tags" class="form-label">Tags</label>
+      <ng-multiselect-dropdown
+        [placeholder]="'Select tags'"
+        [settings]="dropdownSelectFandomsOrTags"
+        [(ngModel)]="selectedTags"
+        [data]="tags"
+        formControlName="tags"
+      ></ng-multiselect-dropdown>
+    </div>
+
+    <div class="mb-3" *ngIf="(focuses$ | async)?.focuses as focuses">
+      <label for="focuses" class="form-label">Focus</label>
+      <ng-multiselect-dropdown
+        [placeholder]="'Select focuses'"
+        [settings]="dropdownSelectFocusesOrRatings"
+        [(ngModel)]="selectedFocus"
+        [data]="focuses"
+        formControlName="focuses"
+        [ngClass]="{
+          'is-invalid': focusesControl?.invalid && focusesControl?.touched
+        }"
+      ></ng-multiselect-dropdown>
+      <div class="invalid-feedback">
+        <span *ngIf="focusesControl?.errors?.required">Focus is required</span>
+      </div>
+    </div>
+
+    <div class="mb-3" *ngIf="(ratings$ | async)?.ratings as ratings">
+      <label for="rating" class="form-label">Ratings</label>
+      <ng-multiselect-dropdown
+        [settings]="dropdownSelectFocusesOrRatings"
+        [placeholder]="'Select ratings'"
+        [(ngModel)]="selectedRating"
+        [data]="ratings"
+        formControlName="ratings"
+        [ngClass]="{
+          'is-invalid': ratingsControl?.invalid && ratingsControl?.touched
+        }"
+      >
+      </ng-multiselect-dropdown>
+      <div class="invalid-feedback">
+        <span *ngIf="ratingsControl?.errors?.required">Rating is required</span>
+      </div>
+    </div>
+    <button
+      class="btn btn-secondary"
+      [disabled]="form.invalid || form.disabled"
+      type="submit"
+    >
+      Update story
+    </button>
+  </form>
+</div>

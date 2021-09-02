@@ -1,4 +1,4 @@
-import { ICharacter } from './character-interface';
+import { ICharacter } from './character.interface';
 
 export interface IFandom {
   id: number

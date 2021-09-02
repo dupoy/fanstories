@@ -1,3 +1,5 @@
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -7,7 +9,13 @@ import { StoriesFilterComponent } from './components/stories-filter/stories-filt
 
 @NgModule({
   declarations: [StoriesFilterComponent],
-  imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    ReactiveFormsModule,
+    NgMultiSelectDropDownModule.forRoot(),
+  ],
   exports: [StoriesFilterComponent],
 })
 export class StoriesFilterModule {}

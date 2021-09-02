@@ -1,3 +1,4 @@
+import { ChapterEntity } from 'src/entities/chapter.entity';
 import { FocusEntity } from 'src/entities/focus.entity';
 
 import { Module } from '@nestjs/common';
@@ -28,6 +29,7 @@ import { StoryService } from './story.service';
       CharacterEntity,
       RatingEntity,
       FocusEntity,
+      ChapterEntity,
     ]),
   ],
   controllers: [StoryController],

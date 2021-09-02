@@ -1,0 +1,39 @@
+<div class="container mt-5">
+  <h1>Create chapter</h1>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="needs-validation">
+    <div class="mb-3">
+      <label for="title" class="form-label">Title</label>
+      <input
+        type="text"
+        class="form-control"
+        id="title"
+        formControlName="title"
+        [ngClass]="{'is-valid': titleControl?.touched && titleControl?.valid}"
+        [ngClass]="{
+          'is-invalid': titleControl?.touched && titleControl?.invalid
+        }"
+      />
+      <div class="invalid-feedback">
+        <p *ngIf="titleControl?.errors?.required">Title is required</p>
+      </div>
+    </div>
+    <div class="mb-3">
+      <angular-editor
+        [config]="editorConfig"
+        formControlName="body"
+        [ngClass]="{'is-valid': bodyControl?.touched && bodyControl?.valid}"
+        [ngClass]="{'is-invalid': bodyControl?.touched && bodyControl?.invalid}"
+      ></angular-editor>
+      <div class="invalid-feedback">
+        <p *ngIf="bodyControl?.errors?.required">Body is required</p>
+      </div>
+    </div>
+    <button
+      type="submit"
+      [disabled]="form.invalid || form.disabled"
+      class="btn btn-secondary"
+    >
+      {{ chapterSlug ? 'Update chapter' : 'Create chapter' }}
+    </button>
+  </form>
+</div>

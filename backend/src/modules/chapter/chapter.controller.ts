@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 
 import { IMessage } from '../../types/message.interface';
 import { User } from '../user/decorators/user.decorator';
@@ -15,11 +15,11 @@ export class ChapterController {
   async getChapter(
     @Param('slug') slug: string,
     @Param('chapterSlug') chapterSlug: string,
-    @User('id') currentUserId: number,
+    @User('id') currentUserId: number
   ): Promise<IChapterResponse> {
     return this.chapterService.buildResponse(
-      await this.chapterService.getChapter(slug, chapterSlug, currentUserId),
-    );
+      await this.chapterService.getChapter(slug, chapterSlug, currentUserId)
+    )
   }
 
   @Post()
@@ -27,45 +27,45 @@ export class ChapterController {
   async createChapter(
     @Body('chapter') createChapterDto: CreateChapterDto,
     @Param('slug') slug: string,
-    @User('id') currentUserId: number,
+    @User('id') currentUserId: number
   ): Promise<IChapterResponse> {
     return this.chapterService.buildResponse(
       await this.chapterService.createChapter(
         createChapterDto,
         slug,
-        currentUserId,
-      ),
-    );
+        currentUserId
+      )
+    )
   }
 
-  @Post('/:chapterSlug')
+  @Put('/:chapterSlug')
   @UseGuards(AuthGuard)
   async updateChapter(
     @Body('chapter') createChapterDto: CreateChapterDto,
     @Param('slug') slug: string,
     @Param('chapterSlug') chapterSlug: string,
-    @User('id') currentUserId: number,
+    @User('id') currentUserId: number
   ): Promise<IChapterResponse> {
     return this.chapterService.buildResponse(
       await this.chapterService.updateChapter(
         createChapterDto,
         slug,
         currentUserId,
-        chapterSlug,
-      ),
-    );
+        chapterSlug
+      )
+    )
   }
   @Delete('/:chapterSlug')
   @UseGuards(AuthGuard)
   async deleteChapter(
     @Param('slug') slug: string,
     @Param('chapterSlug') chapterSlug: string,
-    @User('id') currentUserId: number,
+    @User('id') currentUserId: number
   ): Promise<IMessage> {
     return await this.chapterService.deleteChapter(
       chapterSlug,
       slug,
-      currentUserId,
-    );
+      currentUserId
+    )
   }
 }

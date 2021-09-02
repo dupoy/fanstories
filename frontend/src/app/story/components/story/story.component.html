@@ -1,0 +1,193 @@
+<ng-container *ngIf="story">
+  <div class="container-fluid story-info">
+    <div class="container">
+      <div class="row">
+        <div class="card-body">
+          <h5 class="card-title mb-2 d-flex justify-content-between">
+            <div>
+              <h2 class="info mb-1">{{ story.title }}</h2>
+              <p class="info fs-5">
+                <button class="btn btn-sm btn-light me-2 border-secondary">
+                  {{ story.focus.value }}
+                </button>
+                <button class="btn btn-sm btn-light me-2 border-secondary">
+                  {{ story.rating.value }}
+                </button>
+                <button class="btn btn-sm btn-light me-2 border-secondary">
+                  {{ story.status }}
+                </button>
+                <app-favorite-story
+                  [isFavorite]="story.favorite"
+                  [favoriteCount]="story.favoriteCount"
+                  [storySlug]="story.slug"
+                  [storyAuthor]="story.author.username"
+                ></app-favorite-story>
+                <app-follow-story
+                  [isFollow]="story.follow"
+                  [followCount]="story.followCount"
+                  [storySlug]="story.slug"
+                  [storyAuthor]="story.author.username"
+                ></app-follow-story>
+                <button
+                  *ngIf="isAuthor$ | async"
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deleteStory(story.slug)"
+                >
+                  <i class="bi bi-trash"></i> Delete story
+                </button>
+              </p>
+            </div>
+          </h5>
+          <p class="info">
+            Author:
+            <span class="badge bg-secondary me-1"
+              ><a
+                class="badge-link"
+                [routerLink]="['/profiles', story.author.username]"
+                >{{ story.author.username }}</a
+              ></span
+            >
+          </p>
+          <p class="info">
+            Fandoms:
+            <span
+              class="badge bg-secondary me-1"
+              *ngFor="let fandom of story.fandoms"
+              ><a class="badge-link" [routerLink]="['/stories', fandom.slug]">{{
+                fandom.title
+              }}</a></span
+            >
+          </p>
+          <p class="info">
+            Characters:
+            <span
+              class="badge bg-secondary me-1"
+              *ngFor="let character of story.characters"
+              >{{ character }}</span
+            >
+          </p>
+          <p class="info">
+            Pairings:
+            <span
+              class="badge bg-secondary me-1"
+              *ngFor="let pairing of story.pairings"
+              >{{ pairing }}</span
+            >
+          </p>
+          <p class="info">
+            Tags:
+            <span
+              class="badge bg-secondary me-1"
+              *ngFor="let tag of story.tags"
+              >{{ tag.title }}</span
+            >
+          </p>
+
+          <p class="info">
+            Size: {{ story.words }} words or {{ story.pages }} pages
+          </p>
+          <hr />
+          <p class="card-text">{{ story.description }}</p>
+          <div class="d-flex">
+            <app-follow-user
+              *ngIf="!(isAuthor$ | async)"
+              class="ms-auto"
+              [isFollow]="story.author.following"
+              [profileUsername]="story.author.username"
+            ></app-follow-user>
+            <a
+              class="btn btn-outline-light text-dark ms-auto"
+              [routerLink]="['update']"
+              *ngIf="isAuthor$ | async"
+            >
+              Edit story
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container mt-4">
+    <ng-container *ngIf="!chapter">
+      <div class="d-flex align-items-center">
+        <h2 class="mb-0 me-2">Chapters list</h2>
+        <a [routerLink]="['chapters/create']" class="text-success fs-4"
+          ><i class="bi bi-file-earmark-plus"></i
+        ></a>
+      </div>
+
+      <ul class="list-group mt-2">
+        <li
+          *ngFor="let chapter of story.chapters"
+          class="list-group-item d-flex justify-content-between"
+        >
+          <a
+            class="list-group-item-action"
+            [routerLink]="['chapters', chapter.slug]"
+            >{{ chapter.title }}</a
+          >
+          <a
+            [routerLink]="[
+              '/stories',
+              story.slug,
+              'chapters',
+              chapter.slug,
+              'edit'
+            ]"
+            ><i class="bi bi-pencil-square"></i
+          ></a>
+        </li>
+      </ul>
+    </ng-container>
+    <ng-container *ngIf="chapter">
+      <a class="text-dark" [routerLink]="['/stories', story.slug]"
+        >Go back to chapters</a
+      >
+      <h3>
+        {{ chapter.title }}
+      </h3>
+      <div [innerHtml]="chapter.body"></div>
+      <nav>
+        <ul class="pagination justify-content-end">
+          <li class="page-item" *ngIf="story.chapters[currentChapterIndex - 1]">
+            <a
+              class="page-link"
+              [routerLink]="[
+                '/stories',
+                story.slug,
+                'chapters',
+                story.chapters[currentChapterIndex - 1].slug
+              ]"
+              tabindex="-1"
+              aria-disabled="true"
+              >Previous</a
+            >
+          </li>
+          <li
+            class="page-item"
+            *ngFor="let chapter of story.chapters; let idx = index"
+            routerLinkActive="active"
+          >
+            <a
+              class="page-link"
+              [routerLink]="['/stories', story.slug, 'chapters', chapter.slug]"
+              >{{ idx + 1 }}</a
+            >
+          </li>
+          <li class="page-item" *ngIf="story.chapters[currentChapterIndex + 1]">
+            <a
+              class="page-link"
+              [routerLink]="[
+                '/stories',
+                story.slug,
+                'chapters',
+                story.chapters[currentChapterIndex + 1].slug
+              ]"
+              >Next</a
+            >
+          </li>
+        </ul>
+      </nav>
+    </ng-container>
+  </div>
+</ng-container>

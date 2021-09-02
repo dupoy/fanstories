@@ -1,5 +1,6 @@
 import slugify from 'slugify';
-import { Repository } from 'typeorm';
+import { ChapterEntity } from 'src/entities/chapter.entity';
+import { DeleteResult, Repository } from 'typeorm';
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -23,6 +24,8 @@ export class StoryService {
     private readonly storyRepository: Repository<StoryEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(ChapterEntity)
+    private readonly chapterRepository: Repository<ChapterEntity>,
     private readonly userService: UserService,
     private readonly tagService: TagService,
     private readonly fandomService: FandomService,
@@ -118,14 +121,12 @@ export class StoryService {
     ).fandoms.map((fandom) => {
       return fandom
     })
-    const betas = await this.userService.find(updateStoryDto.betas)
 
     return this.storyRepository.save(
       Object.assign(story, updateStoryDto, {
         focus,
         rating,
         fandoms,
-        betas,
         tags,
       })
     )
@@ -214,7 +215,7 @@ export class StoryService {
       const characters = filterQuery.characters.split(';')
 
       queryBuilder.andWhere(
-        'story.characters::text[] @> (:characters)::text[]',
+        'story.characters::text[] && (:characters)::text[]',
         {
           characters,
         }
@@ -247,24 +248,31 @@ export class StoryService {
       })
     }
 
-    if (filterQuery.rating) {
-      const ratings = filterQuery.rating.split(';')
+    if (filterQuery.ratings) {
+      const ratings = filterQuery.ratings.split(';')
 
-      const ratingIds = await Promise.all(
-        ratings.map((rating) => this.utilsService.findOneByValueRating(rating))
-      )
+      const ratingIds = (
+        await Promise.all(
+          ratings.map((rating) =>
+            this.utilsService.findOneByValueRating(rating)
+          )
+        )
+      ).map((rating) => rating.id)
 
       queryBuilder.andWhere('rating.id IN (:...ids)', {
         ids: ratingIds,
       })
     }
 
-    if (filterQuery.focus) {
-      const focuses = filterQuery.focus.split(';')
+    if (filterQuery.focuses) {
+      const focuses = filterQuery.focuses.split(';')
 
-      const focusIds = await Promise.all(
-        focuses.map((focus) => this.utilsService.findOneByValueFocus(focus))
-      )
+      const focusIds = (
+        await Promise.all(
+          focuses.map((focus) => this.utilsService.findOneByValueFocus(focus))
+        )
+      ).map((focus) => focus.id)
+
       queryBuilder.andWhere('focus.id IN (:...ids)', {
         ids: focusIds,
       })
@@ -325,8 +333,9 @@ export class StoryService {
     }
 
     if (filterQuery.order && filterQuery.sort) {
+      const sort = `story.${filterQuery.sort}`
       queryBuilder.orderBy({
-        [filterQuery.sort]: filterQuery.order,
+        [sort]: filterQuery.order,
       })
     }
 
@@ -474,6 +483,33 @@ export class StoryService {
     }
 
     return story
+  }
+
+  async findOneBySlugAndDelete(
+    slug: string,
+    currentUserId: number
+  ): Promise<DeleteResult> {
+    const story = await this.storyRepository.findOne(
+      {slug},
+      {relations: ['chapters']}
+    )
+
+    if (!story) {
+      throw new HttpException("Story didn't exist", HttpStatus.NOT_FOUND)
+    }
+
+    if (story.author.id !== currentUserId) {
+      throw new HttpException(
+        'You cannot delete this story',
+        HttpStatus.NOT_FOUND
+      )
+    }
+
+    story.chapters.forEach((chapter) =>
+      this.chapterRepository.delete(chapter.id)
+    )
+
+    return this.storyRepository.delete(story.id)
   }
 
   async buildResponse(

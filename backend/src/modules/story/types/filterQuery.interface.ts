@@ -8,8 +8,8 @@ export interface IFilterQuery {
   fandoms?: string
   excludeTags?: string
   excludeFandoms?: string
-  rating?: string
-  focus?: string
+  ratings?: string
+  focuses?: string
   title?: string
   characters?: string
   excludeCharacters?: string

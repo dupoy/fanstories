@@ -17,76 +17,84 @@ export class UtilsService {
     @InjectRepository(RatingEntity)
     private readonly ratingRepository: Repository<RatingEntity>,
     @InjectRepository(FocusEntity)
-    private readonly focusRepository: Repository<FocusEntity>,
+    private readonly focusRepository: Repository<FocusEntity>
   ) {}
 
   async createRating(
-    createRatingDto: CreateFucusOrRatingDto,
+    createRatingDto: CreateFucusOrRatingDto
   ): Promise<RatingEntity> {
     const condidate = await this.ratingRepository.findOne({
       value: createRatingDto.value,
-    });
+    })
 
     if (condidate) {
       throw new HttpException(
         'Rating already exist',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+        HttpStatus.UNPROCESSABLE_ENTITY
+      )
     }
 
-    return this.ratingRepository.save({ ...createRatingDto });
+    return this.ratingRepository.save({...createRatingDto})
   }
 
   async createRatings(
-    createFocusDtos: CreateFucusOrRatingDto[],
+    createFocusDtos: CreateFucusOrRatingDto[]
   ): Promise<IRatingsResponse> {
     return {
       ratings: await Promise.all(
-        createFocusDtos.map(async (rating) => await this.createRating(rating)),
+        createFocusDtos.map(async (rating) => await this.createRating(rating))
       ),
-    };
+    }
   }
 
   async findOneByValueRating(value: string): Promise<RatingEntity> {
-    return this.ratingRepository.findOne({ value });
+    return this.ratingRepository.findOne({value})
   }
 
   async createFocus(
-    createFocusDto: CreateFucusOrRatingDto,
+    createFocusDto: CreateFucusOrRatingDto
   ): Promise<FocusEntity> {
     const condidate = await this.focusRepository.findOne({
       value: createFocusDto.value,
-    });
+    })
 
     if (condidate) {
       throw new HttpException(
         'Rating already exist',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+        HttpStatus.UNPROCESSABLE_ENTITY
+      )
     }
 
-    return this.focusRepository.save({ ...createFocusDto });
+    return this.focusRepository.save({...createFocusDto})
   }
 
   async createFocuses(
-    createFocusDtos: CreateFucusOrRatingDto[],
+    createFocusDtos: CreateFucusOrRatingDto[]
   ): Promise<IFocusesResponse> {
     return {
       focuses: await Promise.all(
-        createFocusDtos.map(async (focus) => await this.createFocus(focus)),
+        createFocusDtos.map(async (focus) => await this.createFocus(focus))
       ),
-    };
+    }
   }
 
   async findOneByValueFocus(value: string): Promise<FocusEntity> {
-    return this.focusRepository.findOne({ value });
+    return this.focusRepository.findOne({value})
+  }
+
+  async findFocus(): Promise<IFocusesResponse> {
+    return {focuses: await this.focusRepository.find()}
+  }
+
+  async findRating(): Promise<IRatingsResponse> {
+    return {ratings: await this.ratingRepository.find()}
   }
 
   buildRatingResponse(rating: RatingEntity): IRatingResponse {
-    return { rating };
+    return {rating}
   }
 
   buildFocusResponse(focus: FocusEntity): IFocusResponse {
-    return { focus };
+    return {focus}
   }
 }

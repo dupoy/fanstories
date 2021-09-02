@@ -1,11 +1,12 @@
 <div class="container" *ngIf="fandoms$ | async as fandoms">
-  <div class="row row-cols-1 row-cols-md-2 g-4 mt-5">
+  <div class="row row-cols-1 row-cols-md-4 g-8 mt-5">
     <div class="col" *ngFor="let fandom of fandoms.fandoms">
       <div class="card border-secondary mb-3" style="max-width: 18rem">
         <div class="card-body">
           <h5 class="card-title">
             <a
-              [routerLink]="['/stories', fandom.slug]"
+              [routerLink]="['/stories']"
+              [queryParams]="{fandoms: fandom.title}"
               class="text-decoration-none text-dark"
               >{{ fandom.title }}</a
             >

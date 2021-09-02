@@ -9,4 +9,8 @@ export interface IFilters {
   excludePairings: string
   tags: string
   excludeTags: string
+  focuses: string
+  ratings: string
+  sort: string
+  order: string
 }

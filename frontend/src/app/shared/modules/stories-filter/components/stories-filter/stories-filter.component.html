@@ -1,198 +1,232 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <div class="mb-3">
-    <label for="title" class="form-label">Title</label>
-    <input
-      formControlName="title"
-      type="text"
-      class="form-control"
-      id="title"
-    />
-  </div>
-  <div class="mb-3">
-    <label for="words" class="form-label">Words</label>
-    <input
-      formControlName="words"
-      type="number"
-      class="form-control"
-      id="words"
-    />
-  </div>
-  <div class="mb-3">
-    <label for="fandoms" class="form-label">Fandoms</label>
-    <select
-      id="fandoms"
-      class="form-select"
-      multiple
-      aria-label="multiple select"
-      formControlName="fandoms"
-      (change)="onFandomSelect()"
-    >
-      <option
-        *ngFor="let fandom of (fandoms$ | async)?.fandoms"
-        [value]="fandom"
-      >
-        {{ fandom.title }}
-      </option>
-    </select>
-    <div class="mb-3 form-check">
+<a
+  class="text-decoration-none text-dark self-align-center mt-3"
+  type="button"
+  data-bs-toggle="collapse"
+  data-bs-target="#filterCollapse"
+  aria-expanded="false"
+  aria-controls="filterCollapse"
+>
+  <i class="bi bi-filter-left"></i>
+  Filters
+</a>
+
+<div class="collapse" id="filterCollapse">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="mb-3">
+      <label for="title" class="form-label">Title</label>
       <input
-        type="checkbox"
-        class="form-check-input"
-        [(ngModel)]="showExcludeFandoms"
-        [ngModelOptions]="{standalone: true}"
+        formControlName="title"
+        type="text"
+        class="form-control"
+        id="title"
       />
-      Exclude fandoms?
     </div>
-  </div>
-  <div class="mb-3" *ngIf="showExcludeFandoms">
-    <label for="fandoms" class="form-label">Exclude fandoms</label>
-    <select
-      id="fandoms"
-      class="form-select"
-      multiple
-      aria-label="multiple select"
-      formControlName="excludeFandoms"
-    >
-      <option
-        *ngFor="let fandom of (fandoms$ | async)?.fandoms"
-        [value]="fandom"
-      >
-        {{ fandom.title }}
-      </option>
-    </select>
-  </div>
-
-  <div class="mb-3">
-    <label for="characters" class="form-label">Characters</label>
-    <select
-      id="characters"
-      class="form-select"
-      multiple
-      aria-label="multiple select"
-      formControlName="characters"
-    >
-      <option *ngFor="let character of characters" [ngValue]="character.name">
-        {{ character.name }}
-      </option>
-    </select>
-    <div class="mb-3 form-check">
+    <div class="mb-3">
+      <label for="words" class="form-label">Words</label>
       <input
-        type="checkbox"
-        class="form-check-input"
-        [(ngModel)]="showExcludeCharacters"
-        [ngModelOptions]="{standalone: true}"
+        formControlName="words"
+        type="number"
+        class="form-control"
+        id="words"
       />
-      Exclude characters?
     </div>
-  </div>
 
-  <div class="mb-3" *ngIf="showExcludeCharacters">
-    <label for="fandoms" class="form-label">Exclude characters</label>
-    <select
-      id="fandoms"
-      class="form-select"
-      multiple
-      aria-label="multiple select"
-      formControlName="excludeCharacters"
-    >
-      <option *ngFor="let character of characters" [ngValue]="character.name">
-        {{ character.name }}
-      </option>
-    </select>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Add pairings</label>
-    <a class="btn btn-link"
-      ><i class="bi bi-plus-lg text-success" (click)="addPairing()"></i
-    ></a>
-
-    <div
-      class="mb-3"
-      formGroupName="pairings"
-      *ngFor="let control of pairings; let idx = index"
-    >
-      <select
-        class="form-select"
-        multiple
-        aria-label="multiple select"
-        [formControlName]="idx"
+    <div class="mb-3" *ngIf="(fandoms$ | async)?.fandoms as fandoms">
+      <label for="fandoms" class="form-label">Fandoms</label>
+      <ng-multiselect-dropdown
+        [settings]="dropdownSelectFandomsOrTags"
+        [placeholder]="'Select fandoms'"
+        formControlName="fandoms"
+        (ngModelChange)="onFandomSelect($event)"
+        [data]="fandoms"
       >
-        <option *ngFor="let character of characters" [ngValue]="character.name">
-          {{ character.name }}
-        </option>
-      </select>
-    </div>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Exclude pairings</label>
-    <a class="btn btn-link"
-      ><i class="bi bi-plus-lg text-success" (click)="excludePairing()"></i
-    ></a>
-
-    <div
-      class="mb-3"
-      formGroupName="excludePairings"
-      *ngFor="let control of excludePairings; let idx = index"
-    >
-      <select
-        class="form-select"
-        multiple
-        aria-label="multiple select"
-        [formControlName]="idx"
+      </ng-multiselect-dropdown>
+      <div class="mb-3 form-check">
+        <input
+          type="checkbox"
+          class="form-check-input"
+          [(ngModel)]="showExcludeFandoms"
+          [ngModelOptions]="{standalone: true}"
+        />
+        Exclude fandoms?
+      </div>
+      <ng-multiselect-dropdown
+        *ngIf="showExcludeFandoms"
+        formControlName="excludeFandoms"
+        [settings]="dropdownSelectFandomsOrTags"
+        [placeholder]="'Select the fandoms you want to exclude'"
+        [data]="fandoms"
       >
-        <option *ngFor="let character of characters" [ngValue]="character.name">
-          {{ character.name }}
-        </option>
-      </select>
+      </ng-multiselect-dropdown>
     </div>
-  </div>
-  <div class="mb-3">
-    <label for="tags" class="form-label">Tags</label>
-    <select
-      id="tags"
-      class="form-select"
-      multiple
-      aria-label="multiple select"
-      formControlName="tags"
-    >
-      <option *ngFor="let tag of (tags$ | async)?.tags" [value]="tag.title">
-        {{ tag.title }}
-      </option>
-    </select>
-    <div class="mb-3 form-check">
-      <input
-        type="checkbox"
-        class="form-check-input"
-        [(ngModel)]="showExcludeTags"
-        [ngModelOptions]="{standalone: true}"
-      />
-      Exclude tags?
+
+    <div class="mb-3" *ngIf="characters.length">
+      <label for="characters" class="form-label">Characters</label>
+      <ng-multiselect-dropdown
+        [settings]="dropdownSelectCharacters"
+        [placeholder]="'Select characters'"
+        formControlName="characters"
+        [data]="characters"
+      >
+      </ng-multiselect-dropdown>
+
+      <div class="mb-3 form-check">
+        <input
+          type="checkbox"
+          class="form-check-input"
+          [(ngModel)]="showExcludeCharacters"
+          [ngModelOptions]="{standalone: true}"
+        />
+        Exclude characters?
+      </div>
+
+      <ng-multiselect-dropdown
+        *ngIf="showExcludeCharacters"
+        formControlName="excludeCharacters"
+        [settings]="dropdownSelectCharacters"
+        [placeholder]="'Select the characters you want to exclude'"
+        [data]="characters"
+      >
+      </ng-multiselect-dropdown>
+
+      <div class="mb-3">
+        <label class="form-label">Add pairings</label>
+        <a class="btn btn-link"
+          ><i class="bi bi-plus-lg text-success" (click)="addPairing()"></i
+        ></a>
+
+        <div
+          class="mb-3"
+          formGroupName="pairings"
+          *ngFor="let control of pairings; let idx = index"
+        >
+          <ng-multiselect-dropdown
+            [formControlName]="idx"
+            [settings]="dropdownSelectCharacters"
+            [placeholder]="'Select pairing'"
+            [data]="characters"
+          >
+          </ng-multiselect-dropdown>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Exclude pairings</label>
+        <a class="btn btn-link"
+          ><i class="bi bi-plus-lg text-success" (click)="excludePairing()"></i
+        ></a>
+
+        <div
+          class="mb-3"
+          formGroupName="excludePairings"
+          *ngFor="let control of excludePairings; let idx = index"
+        >
+          <ng-multiselect-dropdown
+            [formControlName]="idx"
+            [settings]="dropdownSelectCharacters"
+            [placeholder]="'Select the pairing you want to exclude'"
+            [data]="characters"
+          >
+          </ng-multiselect-dropdown>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <div class="mb-3" *ngIf="showExcludeTags">
-    <label for="fandoms" class="form-label">Exclude tags</label>
-    <select
-      id="fandoms"
-      class="form-select"
-      multiple
-      aria-label="multiple select"
-      formControlName="excludeTags"
+    <div class="mb-3" *ngIf="(tags$ | async)?.tags as tags">
+      <label for="tags" class="form-label">Tags</label>
+
+      <ng-multiselect-dropdown
+        formControlName="tags"
+        [settings]="dropdownSelectFandomsOrTags"
+        [placeholder]="'Select tags'"
+        [data]="tags"
+      >
+      </ng-multiselect-dropdown>
+
+      <div class="mb-3 form-check">
+        <input
+          type="checkbox"
+          class="form-check-input"
+          [(ngModel)]="showExcludeTags"
+          [ngModelOptions]="{standalone: true}"
+        />
+        Exclude tags?
+      </div>
+
+      <div class="mb-3" *ngIf="showExcludeTags">
+        <ng-multiselect-dropdown
+          formControlName="excludeTags"
+          [settings]="dropdownSelectFandomsOrTags"
+          [placeholder]="'Select the tags you want to exclude'"
+          [data]="tags"
+        >
+        </ng-multiselect-dropdown>
+      </div>
+    </div>
+
+    <div class="mb-3" *ngIf="(focuses$ | async)?.focuses as focuses">
+      <label for="focus" class="form-label">Focuses</label>
+      <ng-multiselect-dropdown
+        formControlName="focuses"
+        [settings]="dropdownSelectFocusesOrRatings"
+        [placeholder]="'Select focuses'"
+        [data]="focuses"
+      >
+      </ng-multiselect-dropdown>
+    </div>
+
+    <div class="mb-3" *ngIf="(ratings$ | async)?.ratings as ratings">
+      <label for="rating" class="form-label">Ratings</label>
+      <ng-multiselect-dropdown
+        formControlName="ratings"
+        [settings]="dropdownSelectFocusesOrRatings"
+        [placeholder]="'Select ratings'"
+        [data]="ratings"
+      >
+      </ng-multiselect-dropdown>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label me-2">Sort by:</label>
+      <div class="form-check form-check-inline" *ngFor="let sort of sortBy">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="sort"
+          [value]="sort.value"
+          [id]="sort.value"
+          formControlName="sort"
+        />
+        <label class="form-check-label" for="flexRadioDefault1">
+          {{ sort.title }}
+        </label>
+      </div>
+
+      <div>
+        <label class="form-label me-2">Order by:</label>
+        <div class="form-check form-check-inline" *ngFor="let order of orderBy">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="order"
+            [value]="order.value"
+            [id]="order.value"
+            formControlName="order"
+          />
+          <label class="form-check-label" for="flexRadioDefault1">
+            {{ order.title }}
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="me-2 btn btn-sm btn-secondary">Filter</button>
+    <button
+      type="submit"
+      class="btn btn-sm btn-outline-secondary"
+      (click)="onReset()"
     >
-      <option *ngFor="let tag of (tags$ | async)?.tags" [ngValue]="tag.title">
-        {{ tag.title }}
-      </option>
-    </select>
-  </div>
-
-  <button type="submit" class="me-2 btn btn-sm btn-secondary">Filter</button>
-  <button
-    type="submit"
-    class="btn btn-sm btn-outline-secondary"
-    (click)="onReset()"
-  >
-    Reset filter
-  </button>
-</form>
+      Reset filter
+    </button>
+  </form>
+</div>
